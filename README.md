@@ -1,20 +1,24 @@
 # KocoUI — self-hosted PHP web interface for Hermes Agent
 
-Kocoui is a custom Hermes interface written in PHP, the most common scripting language on the web. It gives an existing [Hermes Agent](https://github.com/NousResearch/hermes-agent) a private browser UI: streaming chat, tool approvals, files, and persona editing.
+KocoUI does not run the Hermes agent inside the web server. The browser talks to a PHP app. PHP talks to an existing [Hermes Agent](https://github.com/NousResearch/hermes-agent) on localhost. The API key stays in `config.php`. Login is a password plus TOTP.
 
-The PHP app sits beside Hermes and calls its API on localhost. You install Kocoui with the scripts in this repo. Hermes stays the agent you already run.
+Hermes Agent is a long-running agent with a shell, files, memory, and skills. People reach it from a terminal, from messaging apps, or from a generic chat frontend. KocoUI is a custom Hermes interface for the case where you want that agent behind your own site, in PHP.
+
+![Chat on a phone](docs/screenshots/mobile-dark-collection.jpg)
+
+- The web process and the agent are separate. The browser never receives the API key and never talks to port 8642.
+- Password plus mandatory TOTP. Users are created with `bin/kocoui`. There is no self-registration.
+- After install, `deploy/audit.sh` checks the box and prints no secrets. Read the [security model](docs/security-model.md).
+
+Install with the scripts in this repo, on an Ubuntu VPS where Hermes is already running. Steps: [docs/install.md](docs/install.md).
 
 ## Status
 
 Version 0.x, for a single operator. Users are created with `bin/kocoui user:add`. There is no self-registration and no password reset in the browser. Push notifications are best-effort: a timer drops a run from the queue after 30 minutes. Signing in does not sandbox the agent.
 
-![Chat](docs/screenshots/mobile-dark-collection.jpg)
-
 ## Why a PHP Hermes interface
 
-Hermes Agent is a long-running agent with a shell, files, memory, and skills. People reach it from a terminal, from messaging apps, or from a generic chat frontend pointed at its OpenAI-compatible API.
-
-Kocoui is a purpose-built custom Hermes interface for the case where you want your own site, in PHP:
+Kocoui is the interface for an operator who wants their own site, written in PHP:
 
 
 |                 | Kocoui                                             | Hermes dashboard                    | hermes-webui           | Open WebUI                           |
@@ -63,7 +67,7 @@ Install steps: [docs/install.md](docs/install.md). Quirks worth knowing: [docs/t
 
 ## Security
 
-Whoever signs in can drive an agent that has a shell on the server. Treat the login as the front door of that machine.
+Whoever signs in can drive an agent that has a shell on the server. Treat the login as the front door of that machine. The [security model](docs/security-model.md) says what that login can reach and what stays outside the web process.
 
 - Argon2id passwords, mandatory TOTP, no self-registration (users are created with `bin/kocoui`)
 - Session cookie `Secure`, `HttpOnly`, `SameSite=Strict`, plus CSRF checks

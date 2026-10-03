@@ -20,4 +20,4 @@ The web app keeps the Hermes API key on the server, requires a password and TOTP
 - The agent user has no sudo and no SSH keys to other machines.
 - Port 8642 stays on localhost.
 
-Anyone who signs in can drive an agent that has a shell on the host. That is the design of this interface, not a vulnerability in it.
+Anyone who signs in can drive an agent that has a shell on the host. That is the design of this interface, not a vulnerability in it. The boundary is described in [docs/security-model.md](docs/security-model.md).

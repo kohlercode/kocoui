@@ -4,6 +4,7 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+- Documented the security model, and added contributor notes for people and coding agents.
 - Push status polls time out after 10 seconds, and one timer pass stops after 20 seconds, so a silent gateway cannot stall the queue.
 - `push:watch --dry-run` lists queued runs without sending or deleting. The security audit uses that.
 - Fixed TOTP login so a code from the next 30-second window is rejected and cannot burn the current step.
