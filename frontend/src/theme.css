@@ -1,0 +1,290 @@
+/*
+ * Theme tokens. The interface reads these --k-* variables (Bootstrap's own
+ * variables point at them), so editing one repaints every screen that uses it.
+ * Defaults live here; a saved scheme overrides them from theme.js.
+ */
+
+:root,
+[data-bs-theme='light'] {
+  color-scheme: light;
+  --k-bg: #f3f4f6;
+  --k-bg-rgb: 243, 244, 246;
+  --k-surface: #ffffff;
+  --k-surface-rgb: 255, 255, 255;
+  --k-text: #2c3136;
+  --k-text-rgb: 44, 49, 54;
+  --k-primary: #3f6f9f;
+  --k-primary-rgb: 63, 111, 159;
+  --k-on-primary: #f4f6f8;
+  --k-danger: #b55252;
+  --k-danger-rgb: 181, 82, 82;
+  --k-on-danger: #f4f6f8;
+  --k-success: #3d7a5a;
+  --k-success-rgb: 61, 122, 90;
+  --k-on-success: #f4f6f8;
+  --k-warning: #8f7034;
+  --k-warning-rgb: 143, 112, 52;
+  --k-on-warning: #f4f6f8;
+  --k-info: #547f9c;
+  --k-info-rgb: 84, 127, 156;
+  --k-on-info: #f4f6f8;
+}
+
+[data-bs-theme='dark'] {
+  color-scheme: dark;
+  --k-bg: #1a1d21;
+  --k-bg-rgb: 26, 29, 33;
+  --k-surface: #262a2e;
+  --k-surface-rgb: 38, 42, 46;
+  --k-text: #cfd3d7;
+  --k-text-rgb: 207, 211, 215;
+  --k-primary: #7f9dba;
+  --k-primary-rgb: 127, 157, 186;
+  --k-on-primary: #1c1f23;
+  --k-danger: #c48b90;
+  --k-danger-rgb: 196, 139, 144;
+  --k-on-danger: #1c1f23;
+  --k-success: #7eaa96;
+  --k-success-rgb: 126, 170, 150;
+  --k-on-success: #1c1f23;
+  --k-warning: #c4ae78;
+  --k-warning-rgb: 196, 174, 120;
+  --k-on-warning: #1c1f23;
+  --k-info: #7799ab;
+  --k-info-rgb: 119, 153, 171;
+  --k-on-info: #1c1f23;
+}
+
+/* Bootstrap follows the tokens, in either mode. */
+:root {
+  --bs-body-bg: var(--k-bg);
+  --bs-body-bg-rgb: var(--k-bg-rgb);
+  --bs-body-color: var(--k-text);
+  --bs-body-color-rgb: var(--k-text-rgb);
+  --bs-emphasis-color: var(--k-text);
+  --bs-emphasis-color-rgb: var(--k-text-rgb);
+  --bs-secondary-color: color-mix(in srgb, var(--k-text) 68%, transparent);
+  --bs-tertiary-color: color-mix(in srgb, var(--k-text) 46%, transparent);
+  --bs-secondary-bg: var(--k-surface);
+  --bs-secondary-bg-rgb: var(--k-surface-rgb);
+  --bs-tertiary-bg: var(--k-surface);
+  --bs-tertiary-bg-rgb: var(--k-surface-rgb);
+  --bs-border-color: color-mix(in srgb, var(--k-text) 16%, var(--k-bg));
+  --bs-border-color-translucent: color-mix(in srgb, var(--k-text) 14%, transparent);
+  --bs-heading-color: var(--k-text);
+
+  --bs-primary: var(--k-primary);
+  --bs-primary-rgb: var(--k-primary-rgb);
+  --bs-danger: var(--k-danger);
+  --bs-danger-rgb: var(--k-danger-rgb);
+  --bs-success: var(--k-success);
+  --bs-success-rgb: var(--k-success-rgb);
+  --bs-warning: var(--k-warning);
+  --bs-warning-rgb: var(--k-warning-rgb);
+  --bs-info: var(--k-info);
+  --bs-info-rgb: var(--k-info-rgb);
+
+  --bs-link-color: var(--k-primary);
+  --bs-link-hover-color: var(--k-primary);
+  --bs-link-color-rgb: var(--k-primary-rgb);
+  --bs-link-hover-color-rgb: var(--k-primary-rgb);
+  --bs-focus-ring-color: color-mix(in srgb, var(--k-primary) 28%, transparent);
+  --bs-code-color: color-mix(in srgb, var(--k-danger) 55%, var(--k-primary));
+  --bs-highlight-color: var(--k-text);
+  --bs-highlight-bg: color-mix(in srgb, var(--k-warning) 32%, var(--k-bg));
+  --bs-form-valid-color: var(--k-success);
+  --bs-form-valid-border-color: var(--k-success);
+  --bs-form-invalid-color: var(--k-danger);
+  --bs-form-invalid-border-color: var(--k-danger);
+
+  --bs-primary-bg-subtle: color-mix(in srgb, var(--k-primary) 16%, var(--k-bg));
+  --bs-primary-border-subtle: color-mix(in srgb, var(--k-primary) 38%, var(--k-bg));
+  --bs-primary-text-emphasis: color-mix(in srgb, var(--k-primary) 58%, var(--k-text));
+  --bs-danger-bg-subtle: color-mix(in srgb, var(--k-danger) 16%, var(--k-bg));
+  --bs-danger-border-subtle: color-mix(in srgb, var(--k-danger) 38%, var(--k-bg));
+  --bs-danger-text-emphasis: color-mix(in srgb, var(--k-danger) 55%, var(--k-text));
+  --bs-success-bg-subtle: color-mix(in srgb, var(--k-success) 16%, var(--k-bg));
+  --bs-success-border-subtle: color-mix(in srgb, var(--k-success) 38%, var(--k-bg));
+  --bs-success-text-emphasis: color-mix(in srgb, var(--k-success) 50%, var(--k-text));
+  --bs-warning-bg-subtle: color-mix(in srgb, var(--k-warning) 20%, var(--k-bg));
+  --bs-warning-border-subtle: color-mix(in srgb, var(--k-warning) 42%, var(--k-bg));
+  --bs-warning-text-emphasis: color-mix(in srgb, var(--k-warning) 62%, var(--k-text));
+  --bs-info-bg-subtle: color-mix(in srgb, var(--k-info) 16%, var(--k-bg));
+  --bs-info-border-subtle: color-mix(in srgb, var(--k-info) 38%, var(--k-bg));
+  --bs-info-text-emphasis: color-mix(in srgb, var(--k-info) 50%, var(--k-text));
+  --bs-secondary-bg-subtle: color-mix(in srgb, var(--k-text) 7%, var(--k-bg));
+  --bs-secondary-border-subtle: color-mix(in srgb, var(--k-text) 16%, var(--k-bg));
+  --bs-secondary-text-emphasis: color-mix(in srgb, var(--k-text) 78%, var(--k-bg));
+}
+
+.btn-primary {
+  --bs-btn-color: var(--k-on-primary);
+  --bs-btn-bg: var(--k-primary);
+  --bs-btn-border-color: var(--k-primary);
+  --bs-btn-hover-color: var(--k-on-primary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--k-primary) 86%, black);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--k-primary) 86%, black);
+  --bs-btn-focus-shadow-rgb: var(--k-primary-rgb);
+  --bs-btn-active-color: var(--k-on-primary);
+  --bs-btn-active-bg: color-mix(in srgb, var(--k-primary) 76%, black);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--k-primary) 76%, black);
+  --bs-btn-disabled-color: var(--k-on-primary);
+  --bs-btn-disabled-bg: var(--k-primary);
+  --bs-btn-disabled-border-color: var(--k-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--k-primary);
+  --bs-btn-border-color: var(--k-primary);
+  --bs-btn-hover-color: var(--k-on-primary);
+  --bs-btn-hover-bg: var(--k-primary);
+  --bs-btn-hover-border-color: var(--k-primary);
+  --bs-btn-focus-shadow-rgb: var(--k-primary-rgb);
+  --bs-btn-active-color: var(--k-on-primary);
+  --bs-btn-active-bg: var(--k-primary);
+  --bs-btn-active-border-color: var(--k-primary);
+  --bs-btn-disabled-color: var(--k-primary);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--k-primary);
+}
+
+.btn-danger {
+  --bs-btn-color: var(--k-on-danger);
+  --bs-btn-bg: var(--k-danger);
+  --bs-btn-border-color: var(--k-danger);
+  --bs-btn-hover-color: var(--k-on-danger);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--k-danger) 86%, black);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--k-danger) 86%, black);
+  --bs-btn-focus-shadow-rgb: var(--k-danger-rgb);
+  --bs-btn-active-color: var(--k-on-danger);
+  --bs-btn-active-bg: color-mix(in srgb, var(--k-danger) 76%, black);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--k-danger) 76%, black);
+  --bs-btn-disabled-color: var(--k-on-danger);
+  --bs-btn-disabled-bg: var(--k-danger);
+  --bs-btn-disabled-border-color: var(--k-danger);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--k-danger);
+  --bs-btn-border-color: var(--k-danger);
+  --bs-btn-hover-color: var(--k-on-danger);
+  --bs-btn-hover-bg: var(--k-danger);
+  --bs-btn-hover-border-color: var(--k-danger);
+  --bs-btn-focus-shadow-rgb: var(--k-danger-rgb);
+  --bs-btn-active-color: var(--k-on-danger);
+  --bs-btn-active-bg: var(--k-danger);
+  --bs-btn-active-border-color: var(--k-danger);
+  --bs-btn-disabled-color: var(--k-danger);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--k-danger);
+}
+
+.btn-success {
+  --bs-btn-color: var(--k-on-success);
+  --bs-btn-bg: var(--k-success);
+  --bs-btn-border-color: var(--k-success);
+  --bs-btn-hover-color: var(--k-on-success);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--k-success) 86%, black);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--k-success) 86%, black);
+  --bs-btn-focus-shadow-rgb: var(--k-success-rgb);
+  --bs-btn-active-color: var(--k-on-success);
+  --bs-btn-active-bg: color-mix(in srgb, var(--k-success) 76%, black);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--k-success) 76%, black);
+  --bs-btn-disabled-color: var(--k-on-success);
+  --bs-btn-disabled-bg: var(--k-success);
+  --bs-btn-disabled-border-color: var(--k-success);
+}
+
+.btn-outline-success {
+  --bs-btn-color: var(--k-success);
+  --bs-btn-border-color: var(--k-success);
+  --bs-btn-hover-color: var(--k-on-success);
+  --bs-btn-hover-bg: var(--k-success);
+  --bs-btn-hover-border-color: var(--k-success);
+  --bs-btn-focus-shadow-rgb: var(--k-success-rgb);
+  --bs-btn-active-color: var(--k-on-success);
+  --bs-btn-active-bg: var(--k-success);
+  --bs-btn-active-border-color: var(--k-success);
+  --bs-btn-disabled-color: var(--k-success);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--k-success);
+}
+
+.btn-outline-warning {
+  --bs-btn-color: var(--k-warning);
+  --bs-btn-border-color: var(--k-warning);
+  --bs-btn-hover-color: var(--k-on-warning);
+  --bs-btn-hover-bg: var(--k-warning);
+  --bs-btn-hover-border-color: var(--k-warning);
+  --bs-btn-focus-shadow-rgb: var(--k-warning-rgb);
+  --bs-btn-active-color: var(--k-on-warning);
+  --bs-btn-active-bg: var(--k-warning);
+  --bs-btn-active-border-color: var(--k-warning);
+  --bs-btn-disabled-color: var(--k-warning);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: var(--k-warning);
+}
+
+.btn-secondary {
+  --bs-btn-color: var(--k-bg);
+  --bs-btn-bg: color-mix(in srgb, var(--k-text) 80%, var(--k-bg));
+  --bs-btn-border-color: color-mix(in srgb, var(--k-text) 80%, var(--k-bg));
+  --bs-btn-hover-color: var(--k-bg);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--k-text) 68%, var(--k-bg));
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--k-text) 68%, var(--k-bg));
+  --bs-btn-focus-shadow-rgb: var(--k-text-rgb);
+  --bs-btn-active-color: var(--k-bg);
+  --bs-btn-active-bg: color-mix(in srgb, var(--k-text) 88%, var(--k-bg));
+  --bs-btn-active-border-color: color-mix(in srgb, var(--k-text) 88%, var(--k-bg));
+  --bs-btn-disabled-color: var(--k-bg);
+  --bs-btn-disabled-bg: color-mix(in srgb, var(--k-text) 80%, var(--k-bg));
+  --bs-btn-disabled-border-color: color-mix(in srgb, var(--k-text) 80%, var(--k-bg));
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--k-text);
+  --bs-btn-border-color: color-mix(in srgb, var(--k-text) 28%, var(--k-bg));
+  --bs-btn-hover-color: var(--k-text);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--k-text) 8%, var(--k-surface));
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--k-text) 36%, var(--k-bg));
+  --bs-btn-focus-shadow-rgb: var(--k-text-rgb);
+  --bs-btn-active-color: var(--k-text);
+  --bs-btn-active-bg: color-mix(in srgb, var(--k-text) 12%, var(--k-surface));
+  --bs-btn-active-border-color: color-mix(in srgb, var(--k-text) 36%, var(--k-bg));
+  --bs-btn-disabled-color: var(--k-text);
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: color-mix(in srgb, var(--k-text) 20%, var(--k-bg));
+}
+
+.text-bg-primary { color: var(--k-on-primary) !important; }
+.text-bg-danger { color: var(--k-on-danger) !important; }
+.text-bg-success { color: var(--k-on-success) !important; }
+.text-bg-warning { color: var(--k-on-warning) !important; }
+.text-bg-info { color: var(--k-on-info) !important; }
+
+.nav-pills {
+  --bs-nav-pills-link-active-color: var(--k-on-primary);
+  --bs-nav-pills-link-active-bg: var(--k-primary);
+}
+
+.list-group {
+  --bs-list-group-active-color: var(--k-on-primary);
+  --bs-list-group-active-bg: var(--k-primary);
+  --bs-list-group-active-border-color: var(--k-primary);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: color-mix(in srgb, var(--k-primary) 55%, var(--k-text));
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--k-primary) 25%, transparent);
+}
+
+.form-check-input:checked,
+.form-check-input[type='checkbox']:indeterminate {
+  background-color: var(--k-primary);
+  border-color: var(--k-primary);
+}
+
+.progress-bar {
+  background-color: var(--k-primary);
+}

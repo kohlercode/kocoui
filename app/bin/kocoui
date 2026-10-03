@@ -1,0 +1,12 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+if (PHP_SAPI !== 'cli') {
+    exit(1);
+}
+
+define('APP_ROOT', dirname(__DIR__));
+require APP_ROOT . '/src/autoload.php';
+
+exit(KocoUI\Cli::main($argv));

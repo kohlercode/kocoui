@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily cleanup of kocoui shared files
+
+[Timer]
+OnCalendar=*-*-* 04:15
+RandomizedDelaySec=20min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

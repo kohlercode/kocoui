@@ -1,0 +1,8 @@
+[Unit]
+Description=Remove old kocoui shared files
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/kocoui-files-prune
+Nice=10
+IOSchedulingClass=idle

@@ -1,0 +1,12 @@
+[Unit]
+Description=Keep agent output readable for the kocoui web app
+After=local-fs.target
+
+[Service]
+ExecStart=/usr/local/sbin/kocoui-files-acl
+Restart=always
+RestartSec=5
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,7 @@
+[Unit]
+Description=Restart Hermes gateway when requested by kocoui
+After=hermes-gateway.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/kocoui-restart-gateway

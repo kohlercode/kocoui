@@ -1,0 +1,11 @@
+node_modules/
+.cursor/
+deploy/selftest.sh
+app/public/assets/
+app/config/config.php
+app/var/
+*.local
+.env
+TEMP.md
+MCP_TEMP.md
+*_TEMP.md
