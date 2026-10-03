@@ -54,7 +54,7 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 
 ## Requirements
 
-- Ubuntu 24.04 or 26.04 VPS with Hermes Agent already installed
+- Ubuntu 24.04 or 26.04 VPS with Hermes Agent already installed. CI runs the tests on PHP 8.3. A newer distro PHP, including Ubuntu 26.04, is the same code and is not run in CI.
 - Hermes gateway running, API server bound to `127.0.0.1:8642`
 - DNS name for the UI
 - On your own computer: Node.js 20.19+ or 22.12+, npm, and SSH access as root to the VPS

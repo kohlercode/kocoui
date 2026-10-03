@@ -14,6 +14,8 @@ return [
         'api_key' => '',
         'connect_timeout' => 5,
         'timeout' => 600,
+        // Status polls for push notifications. A silent gateway must not hold the timer.
+        'push_watch_timeout' => 10,
         // The only Hermes-home file the app may read or write. Provision grants access to this path alone.
         'soul_path' => '/home/hermes/.hermes/SOUL.md',
     ],

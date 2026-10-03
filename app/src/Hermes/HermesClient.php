@@ -37,9 +37,9 @@ final class HermesClient
         ]);
     }
 
-    public function runStatus(string $runId): array
+    public function runStatus(string $runId, ?int $timeout = null): array
     {
-        return $this->request('GET', '/v1/runs/' . rawurlencode($runId));
+        return $this->request('GET', '/v1/runs/' . rawurlencode($runId), null, [], $timeout);
     }
 
     public function approve(string $runId, string $choice, ?string $requestId = null): array
@@ -169,7 +169,7 @@ final class HermesClient
         return $status;
     }
 
-    private function request(string $method, string $path, ?array $body = null, array $extraHeaders = []): array
+    private function request(string $method, string $path, ?array $body = null, array $extraHeaders = [], ?int $timeout = null): array
     {
         $headers = array_merge([
             'Authorization: Bearer ' . $this->key,
@@ -180,7 +180,7 @@ final class HermesClient
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => (int) Config::get('hermes.connect_timeout', 5),
-            CURLOPT_TIMEOUT => (int) Config::get('hermes.timeout', 600),
+            CURLOPT_TIMEOUT => $timeout ?? (int) Config::get('hermes.timeout', 600),
         ];
         if ($body !== null) {
             $headers[] = 'Content-Type: application/json';

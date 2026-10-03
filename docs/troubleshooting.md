@@ -50,7 +50,7 @@ The vision side task needs a model that accepts images. See the optional step in
 
 Hermes only streams events while a browser tab is connected. Closed-window alerts are queued when you send a message. The `kocoui-push-watch` timer polls that queue every 20 seconds and pushes "Approval needed" or "Reply ready" plus a link. The payload does not contain the prompt or the command. A run still going after 30 minutes is dropped and gets no push.
 
-`systemctl status kocoui-push-watch.timer` is the first thing to check.
+`systemctl status kocoui-push-watch.timer` is the first thing to check. Each status poll gives up after 10 seconds, and one timer pass stops after 20 seconds, so a gateway that accepts the connection and then stays silent cannot block the other queued runs.
 
 Every open chat tab holds a PHP worker for up to 50 seconds per stream window. `pm.max_children` (12 by default) should stay above the number of concurrent tabs. Raise it only after measuring how much memory one worker uses; each child is capped at 256 MB.
 

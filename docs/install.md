@@ -1,6 +1,6 @@
 # Install the PHP web interface for Hermes Agent
 
-Kocoui is a separate PHP application. These steps assume Hermes Agent is already installed for one user on the same machine, with its API server listening on `127.0.0.1:8642`.
+Kocoui is a separate PHP application. These steps assume Hermes Agent is already installed for one user on the same machine, with its API server listening on `127.0.0.1:8642`. CI runs the tests on PHP 8.3. A newer distro PHP, including Ubuntu 26.04, is the same code and is not run in CI.
 
 Hostnames, system users, and paths below are defaults. Override them with the flags on each script.
 

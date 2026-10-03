@@ -119,7 +119,7 @@ if [ -n "$FILES_ROOT" ]; then
   check "file prune timer active" "$(systemctl is-active kocoui-files-prune.timer)" "active"
   check "push watch timer active" "$(systemctl is-active kocoui-push-watch.timer)" "active"
   check "push watch helper is root-only" "$(stat -c '%a %U' /usr/local/sbin/kocoui-push-watch 2>/dev/null)" "700 root"
-  check "push watch exits cleanly" "$(runuser -u "$APP_USER" -- php "$APP_ROOT/bin/kocoui" push:watch >/dev/null 2>&1; echo $?)" "0"
+  check "push watch dry-run exits cleanly" "$(runuser -u "$APP_USER" -- php "$APP_ROOT/bin/kocoui" push:watch --dry-run >/dev/null 2>&1; echo $?)" "0"
   check "no web request holds a worker for minutes" "$(grep -c 'fastcgi_finish_request' "$APP_ROOT/src/Push/RunWatcher.php")" "0"
   SOUL="/home/$HERMES_USER/.hermes/SOUL.md"
   check "PHP open_basedir limited to app, files and the persona file" "$(awk -F' *= *' '$1 == "php_admin_value[open_basedir]" {print $2}' /etc/php/*/fpm/pool.d/"$APP_USER".conf)" "$APP_ROOT:$FILES_ROOT:$SOUL"

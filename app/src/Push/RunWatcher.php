@@ -23,7 +23,8 @@ final class RunWatcher
     public static function tick(string $runId, int $userId, string $sessionId): string
     {
         try {
-            $st = (new HermesClient())->runStatus($runId);
+            $timeout = (int) Config::get('hermes.push_watch_timeout', 10);
+            $st = (new HermesClient())->runStatus($runId, $timeout > 0 ? $timeout : 10);
         } catch (HttpError $e) {
             if ($e->status === 404) {
                 return 'gone';

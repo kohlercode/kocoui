@@ -5,6 +5,7 @@ namespace KocoUI;
 
 use KocoUI\Auth\Totp;
 use KocoUI\Auth\Users;
+use KocoUI\Push\Notifier;
 use KocoUI\Push\RunWatcher;
 use KocoUI\Push\Vapid;
 use KocoUI\Push\WatchQueue;
@@ -22,7 +23,7 @@ final class Cli
       user:delete <username>    Delete a user
       files:deleted-sessions    Print ids of recently deleted conversations (used by the file prune)
       push:vapid                Generate Web Push VAPID keys (print values for config.php)
-      push:watch                Send push notifications for queued runs (run by a systemd timer)
+      push:watch [--dry-run]    Send push notifications for queued runs (run by a systemd timer)
 
     Run as the app user, e.g.: runuser -u hermesweb -- php /home/hermesweb/app/bin/kocoui user:add alice
     TXT;
@@ -51,7 +52,7 @@ final class Cli
                 'user:delete' => self::userDelete($users, $arg),
                 'files:deleted-sessions' => self::deletedSessions(),
                 'push:vapid' => self::pushVapid(),
-                'push:watch' => self::pushWatch(),
+                'push:watch' => self::pushWatch($arg === '--dry-run'),
                 default => self::fail("Unknown command '$command'\n\n" . self::USAGE),
             };
         } catch (\Throwable $e) {
@@ -85,8 +86,17 @@ final class Cli
         return ($status === 200 && $missing === []) ? 0 : 1;
     }
 
-    private static function pushWatch(): int
+    private static function pushWatch(bool $dryRun = false): int
     {
+        if ($dryRun) {
+            foreach (WatchQueue::due(20) as $row) {
+                echo $row['run_id'], "\n";
+            }
+            return 0;
+        }
+        if (!Notifier::enabled()) {
+            return 0;
+        }
         $dir = APP_ROOT . '/var/run';
         if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
             return self::fail('cannot create var/run');
@@ -101,7 +111,11 @@ final class Cli
         }
         try {
             WatchQueue::purge();
+            $deadline = time() + 20;
             foreach (WatchQueue::due(20) as $row) {
+                if (time() >= $deadline) {
+                    break;
+                }
                 try {
                     $status = RunWatcher::tick((string) $row['run_id'], (int) $row['user_id'], (string) $row['session_id']);
                 } catch (\Throwable $e) {
