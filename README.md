@@ -1,10 +1,10 @@
-# Kocoui — self-hosted PHP web interface for Hermes Agent
+# KocoUI — self-hosted PHP web interface for Hermes Agent
 
 Kocoui is a custom Hermes interface written in PHP, the most common scripting language on the web. It gives an existing [Hermes Agent](https://github.com/NousResearch/hermes-agent) a private browser UI: streaming chat, tool approvals, files, and persona editing.
 
 The PHP app sits beside Hermes and calls its API on localhost. You install Kocoui with the scripts in this repo. Hermes stays the agent you already run.
 
-![Chat](docs/screenshots/chat.png)
+![Chat](docs/screenshots/mobile-dark-collection.jpg)
 
 ## Why a PHP Hermes interface
 
@@ -12,12 +12,14 @@ Hermes Agent is a long-running agent with a shell, files, memory, and skills. Pe
 
 Kocoui is a purpose-built custom Hermes interface for the case where you want your own site, in PHP:
 
-| | Kocoui | Hermes dashboard | hermes-webui | Open WebUI |
-|---|---|---|---|---|
-| What it is | Custom Hermes chat UI | Config UI plus an embedded terminal | Web UI with CLI parity | General chat app connected to Hermes |
-| Language | PHP 8 backend, Preact frontend | Python | Python and vanilla JS | Python |
-| How it connects | Loopback Hermes API, key stays on the server | Local dashboard process | In-process agent | OpenAI-compatible API |
-| Login | Password plus mandatory TOTP, no open registration | Dashboard auth | Your deployment | Its own accounts |
+
+|                 | Kocoui                                             | Hermes dashboard                    | hermes-webui           | Open WebUI                           |
+| --------------- | -------------------------------------------------- | ----------------------------------- | ---------------------- | ------------------------------------ |
+| What it is      | Custom Hermes chat UI                              | Config UI plus an embedded terminal | Web UI with CLI parity | General chat app connected to Hermes |
+| Language        | PHP 8 backend, Preact frontend                     | Python                              | Python and vanilla JS  | Python                               |
+| How it connects | Loopback Hermes API, key stays on the server       | Local dashboard process             | In-process agent       | OpenAI-compatible API                |
+| Login           | Password plus mandatory TOTP, no open registration | Dashboard auth                      | Your deployment        | Its own accounts                     |
+
 
 PHP is a deliberate choice. It is what most web servers already run, and the backend has no Composer dependencies: nginx, PHP-FPM, and SQLite.
 
@@ -33,15 +35,16 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 - Optional Web Push when a reply or an approval is waiting, and a minimal installable PWA
 - Slash commands in the composer: `/help`, `/new`, `/status`, `/stop`, `/restart`
 
-![Tool approval](docs/screenshots/approval.png)
-
-![Files](docs/screenshots/files.png)
-
-![Persona](docs/screenshots/persona.png)
-
-![Phone](docs/screenshots/mobile.png)
-
-The screenshots above are placeholders. Real captures of the interface will replace the files in `docs/screenshots/`.
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/chat-dark.png" alt="Chat interface, dark" width="100%"></td>
+    <td width="50%"><img src="docs/screenshots/chat-light.png" alt="Chat interface, light" width="100%"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/files-light.png" alt="Files" width="100%"></td>
+    <td><img src="docs/screenshots/color-picker-light.png" alt="Color picker" width="100%"></td>
+  </tr>
+</table>
 
 ## Requirements
 
