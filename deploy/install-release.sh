@@ -116,9 +116,19 @@ chmod 600 "$APP_ROOT/config/"*.php
 find "$APP_ROOT/var/data" -type f -exec chmod 600 {} +
 
 echo "== check"
-runuser -u "$APP_USER" -- php "$APP_ROOT/bin/kocoui" check || fail "post-install check failed (old code kept in *.old)"
-
 PHPV="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
+if ! runuser -u "$APP_USER" -- php "$APP_ROOT/bin/kocoui" check; then
+  echo "check failed; rolling back" >&2
+  for d in bin src public; do
+    if [ -d "$APP_ROOT/$d.old" ]; then
+      rm -rf "$APP_ROOT/$d"
+      mv "$APP_ROOT/$d.old" "$APP_ROOT/$d"
+    fi
+  done
+  chown -R "$APP_USER:$APP_USER" "$APP_ROOT"
+  systemctl reload "php$PHPV-fpm" 2>/dev/null || true
+  fail "release rolled back; the previous code is live again"
+fi
 systemctl reload "php$PHPV-fpm"
 rm -rf "$APP_ROOT/bin.old" "$APP_ROOT/src.old" "$APP_ROOT/public.old"
 echo "== installed"

@@ -117,6 +117,10 @@ if [ -n "$FILES_ROOT" ]; then
   check "app cannot write the outbox" "$(tries "$APP_USER" "$FILES_ROOT/outbox")" "no"
   check "ACL watcher running" "$(systemctl is-active kocoui-files-acl.service)" "active"
   check "file prune timer active" "$(systemctl is-active kocoui-files-prune.timer)" "active"
+  check "push watch timer active" "$(systemctl is-active kocoui-push-watch.timer)" "active"
+  check "push watch helper is root-only" "$(stat -c '%a %U' /usr/local/sbin/kocoui-push-watch 2>/dev/null)" "700 root"
+  check "push watch exits cleanly" "$(runuser -u "$APP_USER" -- php "$APP_ROOT/bin/kocoui" push:watch >/dev/null 2>&1; echo $?)" "0"
+  check "no web request holds a worker for minutes" "$(grep -c 'fastcgi_finish_request' "$APP_ROOT/src/Push/RunWatcher.php")" "0"
   SOUL="/home/$HERMES_USER/.hermes/SOUL.md"
   check "PHP open_basedir limited to app, files and the persona file" "$(awk -F' *= *' '$1 == "php_admin_value[open_basedir]" {print $2}' /etc/php/*/fpm/pool.d/"$APP_USER".conf)" "$APP_ROOT:$FILES_ROOT:$SOUL"
   check "app can read the persona file" "$(runuser -u "$APP_USER" -- head -c 1 "$SOUL" >/dev/null 2>&1 && echo yes)" "yes"
@@ -142,6 +146,11 @@ check "certificate renewal timer active" "$(systemctl is-active certbot.timer)" 
 check "backup timer active" "$(systemctl is-active kocoui-backup.timer)" "active"
 check "a Hermes backup from the last 2 days" "$(find /var/backups/hermes -name 'hermes-*.zip' -mtime -2 2>/dev/null | grep -q . && echo yes || echo no)" "yes"
 check "backups readable by root only" "$(stat -c '%a %U' /var/backups/hermes 2>/dev/null)" "700 root"
+EXT_MISSING=""
+for ext in sodium openssl curl json mbstring fileinfo gd sqlite3 pdo_sqlite; do
+  runuser -u "$APP_USER" -- php -m | grep -qx "$ext" || EXT_MISSING="$EXT_MISSING $ext"
+done
+check "php extensions present" "${EXT_MISSING:-ok}" "ok"
 
 unset KEY BASIC
 echo

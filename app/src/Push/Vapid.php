@@ -12,7 +12,14 @@ final class Vapid
     {
         $pub = (string) Config::get('push.vapid_public', '');
         $priv = (string) Config::get('push.vapid_private', '');
-        return $pub !== '' && $priv !== '' && strlen(Base64Url::decode($pub)) === 65;
+        if ($pub === '' || $priv === '') {
+            return false;
+        }
+        try {
+            return strlen(Base64Url::decode($pub)) === 65 && strlen(Base64Url::decode($priv)) === 32;
+        } catch (\InvalidArgumentException) {
+            return false;
+        }
     }
 
     public static function publicKey(): string

@@ -4,6 +4,12 @@ Kocoui is a separate PHP application. These steps assume Hermes Agent is already
 
 Hostnames, system users, and paths below are defaults. Override them with the flags on each script.
 
+| Thing | Name | Why |
+| --- | --- | --- |
+| Product, repo, and CLI | KocoUI / `kocoui` | public name |
+| System user, PHP-FPM pool, nginx directories, fail2ban jail | `hermesweb` | the name an install already uses; renaming it is a migration |
+| Session cookie | `__Host-hwsid` | the name an install already uses |
+
 ## 1. Prepare Hermes
 
 Follow the [Hermes Agent install guide](https://hermes-agent.nousresearch.com/docs/getting-started/installation) so that:
@@ -33,13 +39,13 @@ On the VPS as root, from a copy of this repo's `deploy/` directory:
 
 Useful flags: `--app-user hermesweb`, `--hermes-user hermes`, `--files-root /srv/kocoui/files`, `--upload-max-mb 50`, `--basic-auth-user NAME`.
 
-The script is safe to run again. It installs nginx, PHP-FPM (curl, mbstring, sqlite3, gd), certbot, fail2ban, and ufw rules for ports 22, 80, and 443. It creates the app user, a PHP pool that cannot call `exec`, the shared `inbox/` and `outbox/` folders, a TLS certificate, and HTTP basic auth. The basic-auth password is written to `/root/basic-auth-<domain>.txt` (mode 600).
+The script is safe to run again. It installs nginx, PHP-FPM (curl, mbstring, sqlite3, gd, and `ext-sodium` when the distro package does not already include it), certbot, fail2ban, and ufw rules for ports 22, 80, and 443. Login needs `ext-sodium`. It creates the app user, a PHP pool that cannot call `exec`, the shared `inbox/` and `outbox/` folders, a TLS certificate, and HTTP basic auth. The basic-auth password is written to `/root/basic-auth-<domain>.txt` (mode 600).
 
 It also sets Hermes `platform_hints.api_server.replace` so replies use GitHub-flavored Markdown, which this UI renders. That writes a Hermes config key.
 
 ## 3. Deploy the app
 
-On your computer, in this repo (Node.js 20 or 22):
+On your computer, in this repo (Node.js 20.19+ or 22.12+):
 
 ```bash
 npm ci

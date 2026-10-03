@@ -1,0 +1,8 @@
+[Unit]
+Description=Send kocoui push notifications for finished or blocked runs
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/kocoui-push-watch
+Nice=10
+IOSchedulingClass=idle

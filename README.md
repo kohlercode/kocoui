@@ -4,6 +4,10 @@ Kocoui is a custom Hermes interface written in PHP, the most common scripting la
 
 The PHP app sits beside Hermes and calls its API on localhost. You install Kocoui with the scripts in this repo. Hermes stays the agent you already run.
 
+## Status
+
+Version 0.x, for a single operator. Users are created with `bin/kocoui user:add`. There is no self-registration and no password reset in the browser. Push notifications are best-effort: a timer drops a run from the queue after 30 minutes. Signing in does not sandbox the agent.
+
 ![Chat](docs/screenshots/mobile-dark-collection.jpg)
 
 ## Why a PHP Hermes interface
@@ -20,6 +24,8 @@ Kocoui is a purpose-built custom Hermes interface for the case where you want yo
 | How it connects | Loopback Hermes API, key stays on the server       | Local dashboard process             | In-process agent       | OpenAI-compatible API                |
 | Login           | Password plus mandatory TOTP, no open registration | Dashboard auth                      | Your deployment        | Its own accounts                     |
 
+
+Comparison as of October 2026. Check each project for how it works today.
 
 PHP is a deliberate choice. It is what most web servers already run, and the backend has no Composer dependencies: nginx, PHP-FPM, and SQLite.
 
@@ -51,7 +57,7 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 - Ubuntu 24.04 or 26.04 VPS with Hermes Agent already installed
 - Hermes gateway running, API server bound to `127.0.0.1:8642`
 - DNS name for the UI
-- On your own computer: Node.js 20 or 22, npm, and SSH access as root to the VPS
+- On your own computer: Node.js 20.19+ or 22.12+, npm, and SSH access as root to the VPS
 
 Install steps: [docs/install.md](docs/install.md). Quirks worth knowing: [docs/troubleshooting.md](docs/troubleshooting.md).
 

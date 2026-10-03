@@ -15,19 +15,26 @@ final class Totp
     }
 
     /**
+     * @param int|null $now Unix time to use instead of time() (tests only).
      * @return int|false the matched time step, or false. Steps at or below $lastStep
-     *                   are refused so an observed code cannot be replayed.
+     *                   are refused so an observed code cannot be replayed, and a
+     *                   match can never advance past the current step: an
+     *                   authenticator running ahead must not burn the window that
+     *                   the correct code will need.
      */
-    public static function verify(string $secret, string $code, int $lastStep = 0, int $window = 1): int|false
+    public static function verify(string $secret, string $code, int $lastStep = 0, int $window = 1, ?int $now = null): int|false
     {
         if (!preg_match('/^\d{6}$/', $code)) {
             return false;
         }
-        $current = intdiv(time(), self::PERIOD);
+        $current = intdiv($now ?? time(), self::PERIOD);
         $matched = false;
         for ($i = -$window; $i <= $window; $i++) {
             $step = $current + $i;
-            if ($step > $lastStep && hash_equals(self::code($secret, $step), $code)) {
+            if ($step > $current || $step <= $lastStep) {
+                continue;
+            }
+            if (hash_equals(self::code($secret, $step), $code)) {
                 $matched = $step;
             }
         }

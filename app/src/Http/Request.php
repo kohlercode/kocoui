@@ -15,6 +15,14 @@ final class Request
     ) {
     }
 
+    /** Build a request with a parsed JSON body. Used by the test suite. */
+    public static function fake(string $method, string $path, array $body = [], array $server = []): self
+    {
+        $req = new self(strtoupper($method), $path, [], $server);
+        $req->json = $body;
+        return $req;
+    }
+
     public static function fromGlobals(): self
     {
         $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);

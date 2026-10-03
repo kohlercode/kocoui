@@ -49,6 +49,14 @@ function shellQuote(s) {
   return `'${String(s).replace(/'/g, `'\\''`)}'`;
 }
 
+function nodeSatisfies(version) {
+  const [major, minor] = version.split('.').map((n) => Number.parseInt(n, 10));
+  if (major === 20) return minor >= 19;
+  if (major > 22) return true;
+  if (major === 22) return minor >= 12;
+  return false;
+}
+
 const args = parseArgs(process.argv.slice(2));
 const host = args.host;
 if (!host || !/^[A-Za-z0-9._@-]+$/.test(host)) {
@@ -57,6 +65,10 @@ if (!host || !/^[A-Za-z0-9._@-]+$/.test(host)) {
 const appUser = args['app-user'] || 'hermesweb';
 if (!/^[a-z_][a-z0-9_-]*$/.test(appUser)) fail('invalid --app-user');
 if (args.domain && !/^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$/.test(args.domain)) fail('invalid --domain');
+
+if (!nodeSatisfies(process.versions.node)) {
+  fail(`Node.js ${process.versions.node} is too old. Need ^20.19.0 or >=22.12.0`);
+}
 
 if (!args['skip-build']) {
   run(IS_WIN ? 'npm.cmd' : 'npm', ['run', 'build'], { shell: IS_WIN });

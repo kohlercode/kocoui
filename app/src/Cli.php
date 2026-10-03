@@ -5,7 +5,9 @@ namespace KocoUI;
 
 use KocoUI\Auth\Totp;
 use KocoUI\Auth\Users;
+use KocoUI\Push\RunWatcher;
 use KocoUI\Push\Vapid;
+use KocoUI\Push\WatchQueue;
 
 final class Cli
 {
@@ -20,6 +22,7 @@ final class Cli
       user:delete <username>    Delete a user
       files:deleted-sessions    Print ids of recently deleted conversations (used by the file prune)
       push:vapid                Generate Web Push VAPID keys (print values for config.php)
+      push:watch                Send push notifications for queued runs (run by a systemd timer)
 
     Run as the app user, e.g.: runuser -u hermesweb -- php /home/hermesweb/app/bin/kocoui user:add alice
     TXT;
@@ -48,6 +51,7 @@ final class Cli
                 'user:delete' => self::userDelete($users, $arg),
                 'files:deleted-sessions' => self::deletedSessions(),
                 'push:vapid' => self::pushVapid(),
+                'push:watch' => self::pushWatch(),
                 default => self::fail("Unknown command '$command'\n\n" . self::USAGE),
             };
         } catch (\Throwable $e) {
@@ -57,16 +61,62 @@ final class Cli
 
     private static function check(Users $users): int
     {
+        echo 'kocoui:  ' . Version::VERSION . "\n";
+        $required = ['sodium', 'openssl', 'curl', 'json', 'mbstring', 'fileinfo', 'gd', 'sqlite3', 'pdo_sqlite', 'session', 'hash'];
+        $missing = array_values(array_filter($required, static fn (string $e): bool => !extension_loaded($e)));
+        echo 'extensions: ' . ($missing === [] ? 'ok' : 'MISSING ' . implode(', ', $missing)) . "\n";
         echo "config:   ok (" . Config::get('base_url') . ")\n";
         echo "database: ok (" . count($users->all()) . " user(s))\n";
-        $push = Vapid::configured() ? 'configured' : 'disabled (empty push.vapid_* keys)';
+        $pub = (string) Config::get('push.vapid_public', '');
+        $priv = (string) Config::get('push.vapid_private', '');
+        if ($pub === '' || $priv === '') {
+            $push = 'disabled (empty push.vapid_* keys)';
+        } elseif (!Vapid::configured()) {
+            $push = 'INVALID vapid keys (ignored; run push:vapid)';
+        } else {
+            $push = 'configured';
+        }
         echo "push:     $push\n";
         $base = rtrim((string) Config::get('hermes.base_url'), '/');
         [$status] = self::probe("$base/health", null);
         echo "hermes /health: HTTP $status\n";
         [$status] = self::probe("$base/v1/models", (string) Config::get('hermes.api_key'));
         echo "hermes /v1/models with key: HTTP $status" . ($status === 401 ? ' (API key rejected)' : '') . "\n";
-        return $status === 200 ? 0 : 1;
+        return ($status === 200 && $missing === []) ? 0 : 1;
+    }
+
+    private static function pushWatch(): int
+    {
+        $dir = APP_ROOT . '/var/run';
+        if (!is_dir($dir) && !mkdir($dir, 0700, true) && !is_dir($dir)) {
+            return self::fail('cannot create var/run');
+        }
+        $fh = fopen($dir . '/push-watch.lock', 'c');
+        if ($fh === false) {
+            return self::fail('cannot open push-watch lock');
+        }
+        if (!flock($fh, LOCK_EX | LOCK_NB)) {
+            fclose($fh);
+            return 0;
+        }
+        try {
+            WatchQueue::purge();
+            foreach (WatchQueue::due(20) as $row) {
+                try {
+                    $status = RunWatcher::tick((string) $row['run_id'], (int) $row['user_id'], (string) $row['session_id']);
+                } catch (\Throwable $e) {
+                    error_log('kocoui push watch: ' . $e->getMessage());
+                    continue;
+                }
+                if (in_array($status, ['completed', 'failed', 'cancelled', 'interrupted', 'gone'], true)) {
+                    WatchQueue::forget((string) $row['run_id']);
+                }
+            }
+        } finally {
+            flock($fh, LOCK_UN);
+            fclose($fh);
+        }
+        return 0;
     }
 
     private static function pushVapid(): int

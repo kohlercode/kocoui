@@ -66,6 +66,16 @@ final class Db
             PRIMARY KEY (run_id, kind)
         );
         SQL,
+        <<<'SQL'
+        CREATE TABLE watch_queue (
+            run_id TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            session_id TEXT NOT NULL,
+            created_at INTEGER NOT NULL,
+            expires_at INTEGER NOT NULL
+        );
+        CREATE INDEX watch_queue_expires ON watch_queue (expires_at);
+        SQL,
     ];
 
     public static function pdo(): PDO

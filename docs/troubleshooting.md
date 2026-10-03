@@ -48,13 +48,21 @@ The vision side task needs a model that accepts images. See the optional step in
 
 ## Notifications never arrive with the tab closed
 
-Hermes only streams events while a browser tab is connected. Closed-window alerts come from a server-side watcher started when you send a message. Push payloads are short status lines ("Approval needed", "Reply ready") and a link. They do not contain the prompt or the command.
+Hermes only streams events while a browser tab is connected. Closed-window alerts are queued when you send a message. The `kocoui-push-watch` timer polls that queue every 20 seconds and pushes "Approval needed" or "Reply ready" plus a link. The payload does not contain the prompt or the command. A run still going after 30 minutes is dropped and gets no push.
+
+`systemctl status kocoui-push-watch.timer` is the first thing to check.
+
+Every open chat tab holds a PHP worker for up to 50 seconds per stream window. `pm.max_children` (12 by default) should stay above the number of concurrent tabs. Raise it only after measuring how much memory one worker uses; each child is capped at 256 MB.
 
 The service worker does not cache the signed-in app.
 
 ## The site will not install on a phone
 
 HTTP basic auth is in front of the whole vhost. The web app manifest is requested with credentials so that fetch is not anonymous. If you remove basic auth, the manifest link can stay as it is.
+
+## Rolling back a release
+
+`install-release.sh` runs `bin/kocoui check` after swapping in new code. If that check fails, it moves the previous `bin/`, `src/`, and `public/` back into place and reloads PHP-FPM. A database migration from the newer release is not undone: schema steps only move forward.
 
 ## Gateway restart from the UI does nothing
 

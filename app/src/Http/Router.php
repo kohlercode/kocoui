@@ -34,7 +34,9 @@ final class Router
             return [$route['handler'], $params, $route['opts']];
         }
         if ($allowed) {
-            header('Allow: ' . implode(', ', array_unique($allowed)));
+            if (!headers_sent()) {
+                header('Allow: ' . implode(', ', array_unique($allowed)));
+            }
             throw new HttpError(405, 'method_not_allowed', 'Method not allowed');
         }
         throw new HttpError(404, 'not_found', 'Not found');

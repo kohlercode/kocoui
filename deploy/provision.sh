@@ -63,6 +63,7 @@ apt-get update -q
 apt-get install -y -q nginx php-fpm php-cli php-curl php-mbstring php-sqlite3 php-gd certbot apache2-utils fail2ban ufw acl inotify-tools
 PHPV="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
 echo "PHP $PHPV"
+php -m | grep -qx sodium || apt-get install -y -q "php${PHPV}-sodium"
 
 log "app user and directories"
 id "$APP_USER" >/dev/null 2>&1 || adduser --disabled-password --gecos "" "$APP_USER"
@@ -89,12 +90,15 @@ setfacl -m "u:$HERMES_USER:rX" -m "d:u:$HERMES_USER:rX" -m "d:g:$APP_USER:rX" -m
 setfacl -R -P -m "g:$APP_USER:rX,m::rX" -m "d:g:$APP_USER:rX,d:m::rX" "$FILES_ROOT/outbox"
 render "$T/kocoui-files-acl.sh" /usr/local/sbin/kocoui-files-acl
 render "$T/kocoui-files-prune.sh" /usr/local/sbin/kocoui-files-prune
-chmod 700 /usr/local/sbin/kocoui-files-acl /usr/local/sbin/kocoui-files-prune
-for u in kocoui-files-acl.service kocoui-files-prune.service kocoui-files-prune.timer; do
+render "$T/kocoui-push-watch.sh" /usr/local/sbin/kocoui-push-watch
+chmod 700 /usr/local/sbin/kocoui-files-acl /usr/local/sbin/kocoui-files-prune /usr/local/sbin/kocoui-push-watch
+for u in kocoui-files-acl.service kocoui-files-prune.service kocoui-files-prune.timer \
+         kocoui-push-watch.service kocoui-push-watch.timer; do
   render "$T/$u" "/etc/systemd/system/$u"
 done
 systemctl daemon-reload
 systemctl enable --now kocoui-files-prune.timer >/dev/null
+systemctl enable --now kocoui-push-watch.timer >/dev/null
 systemctl enable kocoui-files-acl.service >/dev/null
 systemctl restart kocoui-files-acl.service
 getfacl -p "$FILES_ROOT/inbox" "$FILES_ROOT/outbox" 2>/dev/null | grep -E '^(# file|user:|group:|default:user:[a-z])'

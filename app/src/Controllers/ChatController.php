@@ -7,8 +7,11 @@ use KocoUI\Config;
 use KocoUI\DeletedSessions;
 use KocoUI\Files;
 use KocoUI\Hermes\HermesClient;
-use KocoUI\Push\RunWatcher;
+use KocoUI\Push\Notifier;
+use KocoUI\Push\Subscriptions;
+use KocoUI\Push\WatchQueue;
 use KocoUI\Session;
+use KocoUI\Version;
 use KocoUI\Uploads;
 use KocoUI\Http\HttpError;
 use KocoUI\Http\Request;
@@ -25,6 +28,7 @@ final class ChatController
     {
         $caps = (new HermesClient())->capabilities();
         Response::json([
+            'kocoui' => ['version' => Version::VERSION],
             'features' => $caps['features'] ?? [],
             'files' => [
                 'max_upload_bytes' => FilesController::maxBytes(),
@@ -110,22 +114,18 @@ final class ChatController
             $input = ltrim($input . "\n\n" . self::ATTACHMENT_HEADER . "\n" . implode("\n", $lines));
         }
         $res = (new HermesClient())->run($input, $sessionId, $key, self::model($req->string('model', 300)), self::instructions($sessionId));
-        $payload = [
+        $runId = is_string($res['run_id'] ?? null) ? $res['run_id'] : '';
+        $uid = Session::userId();
+        if ($runId !== '' && $uid !== null && empty($res['replayed'])
+            && Notifier::enabled() && Subscriptions::countForUser($uid) > 0) {
+            WatchQueue::add($runId, $uid, $sessionId);
+        }
+        Response::json([
             'run_id' => $res['run_id'] ?? null,
             'status' => $res['status'] ?? null,
             'replayed' => $res['replayed'] ?? false,
             'session_id' => $sessionId,
-        ];
-        // Finish the HTTP response before watching so closed tabs still get push.
-        http_response_code(202);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
-        $runId = is_string($payload['run_id'] ?? null) ? $payload['run_id'] : '';
-        $uid = Session::userId();
-        if ($runId !== '' && $uid !== null && empty($payload['replayed'])) {
-            RunWatcher::maybeWatch($runId, $uid, $sessionId);
-        }
-        exit;
+        ], 202);
     }
 
     public static function runStatus(Request $req, array $p): never

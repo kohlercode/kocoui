@@ -45,9 +45,14 @@ final class AuthController
         $users = new Users($db);
         $user = $users->findByUsername($username);
         $passwordOk = Users::verifyPassword($password, $user['password_hash'] ?? null);
-        $step = ($user && $passwordOk)
-            ? Totp::verify($users->totpSecret($user), $code, (int) $user['totp_last_step'])
-            : false;
+        $step = false;
+        if ($user && $passwordOk) {
+            try {
+                $step = Totp::verify($users->totpSecret($user), $code, (int) $user['totp_last_step']);
+            } catch (\Throwable) {
+                error_log('kocoui: stored TOTP secret is unreadable for user ' . $user['id']);
+            }
+        }
 
         if ($step === false) {
             $throttle->record($req->ip(), $username, false);
