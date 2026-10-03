@@ -2,9 +2,10 @@ import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 import en from './en.json';
 import de from './de.json';
+import es from './es.json';
 
-export const LANGUAGES = { en: 'English', de: 'Deutsch' };
-const DICTS = { en, de };
+export const LANGUAGES = { en: 'English', de: 'Deutsch', es: 'Español' };
+const DICTS = { en, de, es };
 const KEY = 'kocoui.lang';
 
 export function initialLang() {

@@ -6,7 +6,7 @@ KocoUI is a small PHP application. A useful change is one that a stranger can in
 
 - Run `php tests/run.php` from the repo root. All tests should pass.
 - If you changed the frontend, run `npm run build`.
-- User-facing strings go in both `frontend/src/i18n/en.json` and `frontend/src/i18n/de.json`. German uses the informal "du".
+- User-facing strings go in `frontend/src/i18n/en.json`, `de.json`, and `es.json`. German uses the informal "du". Spanish uses the informal "tú".
 - New config keys get a default in code and an entry in `app/config/config.example.php`.
 - Schema changes are a new entry at the end of `Db::MIGRATIONS`. Do not edit a migration that already shipped.
 - Comments explain a constraint the code cannot show. Skip comments that restate the next line.

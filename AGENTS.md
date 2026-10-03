@@ -16,7 +16,7 @@ A self-hosted PHP web interface for an existing Hermes Agent on the same machine
 - Every file path from the browser or an agent reply goes through `Files::resolve()`.
 - Persona edits `SOUL.md` only, in place, with one previous copy under `app/var/soul`.
 - Web Push payloads are status lines and links, not prompts or commands.
-- User-facing strings belong in both `frontend/src/i18n/en.json` and `frontend/src/i18n/de.json`.
+- User-facing strings belong in `frontend/src/i18n/en.json`, `de.json`, and `es.json`. German uses "du". Spanish uses "tú".
 
 ## Checks
 

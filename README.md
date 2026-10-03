@@ -41,7 +41,7 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 - Model picker, tools and skills list, scheduled jobs
 - Uploads (button, drag and drop, paste) and files the agent sends back, with an album and a lightbox
 - Persona page that edits Hermes `SOUL.md` in place
-- Light and dark themes, English and German
+- Light and dark themes, English, German, and Spanish
 - Optional Web Push when a reply or an approval is waiting, and a minimal installable PWA
 - Slash commands in the composer: `/help`, `/new`, `/status`, `/stop`, `/restart`
 
