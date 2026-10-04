@@ -60,6 +60,12 @@ The service worker does not cache the signed-in app.
 
 HTTP basic auth is in front of the whole vhost. The web app manifest is requested with credentials so that fetch is not anonymous. If you remove basic auth, the manifest link can stay as it is.
 
+## The microphone stays blocked
+
+The composer records with the browser microphone and uploads the clip as an audio file. The vhost must send `Permissions-Policy: microphone=(self)`. The older value `microphone=()` rejects the microphone even after the visitor allows it, and the composer then says the microphone is blocked.
+
+`npm run deploy` does not rewrite nginx snippets. On an install created before this header, replace `microphone=()` with `microphone=(self)` in `/etc/nginx/snippets/hermesweb-headers-base.conf`, run `nginx -t`, and reload nginx. New installs get the line from `deploy/templates/nginx-headers-base.conf`.
+
 ## Rolling back a release
 
 `install-release.sh` runs `bin/kocoui check` after swapping in new code. If that check fails, it moves the previous `bin/`, `src/`, and `public/` back into place and reloads PHP-FPM. A database migration from the newer release is not undone: schema steps only move forward.

@@ -351,6 +351,7 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
         model={effectiveModel}
         onModelChange={chooseModel}
         attachments={attachments}
+        maxUploadBytes={limits?.max_upload_bytes}
       />
     </div>
   );

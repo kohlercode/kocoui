@@ -4,6 +4,12 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-04
+
+- A record button in the composer captures a voice message and sends it as an audio file. The agent reads that file the same way it reads an uploaded mp3. A long take is stored as short blobs and stops before the upload limit.
+- The site header allows the microphone for its own origin (`microphone=(self)`). An install created earlier keeps `microphone=()` until that nginx snippet is updated and nginx is reloaded. A release deploy does not change nginx snippets.
+- The header shows the app version next to the name, in the theme accent color.
+
 ## [0.2.1] - 2026-10-04
 
 - The Send button submits the draft. A long message stays in the field instead of pushing the button out of the row.

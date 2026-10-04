@@ -31,7 +31,7 @@ final class Shell
         header('Content-Type: text/html; charset=utf-8');
         header('X-Robots-Tag: noindex, nofollow');
         echo "<!doctype html>\n";
-        echo '<html lang="' . $e($lang) . '" data-default-lang="' . $e($lang) . '" data-app-name="' . $e($name) . '">';
+        echo '<html lang="' . $e($lang) . '" data-default-lang="' . $e($lang) . '" data-app-name="' . $e($name) . '" data-app-version="' . $e(Version::VERSION) . '">';
         echo '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
         echo '<meta name="robots" content="noindex, nofollow"><title>' . $e($name) . '</title>';
         echo '<meta name="theme-color" content="#212529">';

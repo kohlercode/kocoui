@@ -43,6 +43,8 @@ export function Layout({ user, onLoggedOut }) {
   const [models, setModels] = useState(null);
   const [limits, setLimits] = useState(null);
   const appName = document.documentElement.dataset.appName || 'Hermes';
+  const rawVersion = document.documentElement.dataset.appVersion || '';
+  const appVersion = /^\d+\.\d+\.\d+$/.test(rawVersion) ? rawVersion : '';
 
   const loadSessions = useCallback(async () => {
     setSessionsLoading(true);
@@ -189,6 +191,11 @@ export function Layout({ user, onLoggedOut }) {
             <i class="bi bi-robot me-2" aria-hidden="true"></i>
             {appName}
           </span>
+          {appVersion && (
+            <span class="app-version" aria-label={t('nav.version', { version: appVersion })}>
+              {appVersion}
+            </span>
+          )}
         </div>
         <div class="d-flex align-items-center gap-2">
           <div class="btn-group btn-group-sm" role="group" aria-label={t('nav.views')}>

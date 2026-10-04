@@ -3,6 +3,13 @@ import { useI18n } from '../i18n/index.js';
 import { errorText } from '../util.js';
 import { fileIcon, humanSize } from '../uploads.js';
 import { matchingCommands } from '../commands.js';
+import { useVoiceRecorder } from '../recorder.js';
+
+function clock(total) {
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
 
 function AttachmentChip({ item, onRemove }) {
   const { t } = useI18n();
@@ -29,12 +36,16 @@ function AttachmentChip({ item, onRemove }) {
   );
 }
 
-export function Composer({ value, onChange, onSubmit, onStop, busy, running, canSteer, models, choices, model, onModelChange, attachments }) {
+export function Composer({ value, onChange, onSubmit, onStop, busy, running, canSteer, models, choices, model, onModelChange, attachments, maxUploadBytes }) {
   const { t } = useI18n();
   const ref = useRef(null);
   const picker = useRef(null);
   const menuRef = useRef(null);
   const { items, add, remove, uploading, failed, ready } = attachments;
+  const voice = useVoiceRecorder({
+    maxBytes: maxUploadBytes || 50 * 1024 * 1024,
+    onClip: (file) => add([file]),
+  });
   const matches = running ? [] : matchingCommands(value);
   const [active, setActive] = useState(0);
   const menuOpen = matches.length > 0;
@@ -58,7 +69,7 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
 
   const hasContent = value.trim() !== '' || (!running && ready.length > 0);
   const blocked = !running && (uploading || failed);
-  const canSend = !busy && hasContent && !blocked && (!running || canSteer);
+  const canSend = !busy && !voice.recording && hasContent && !blocked && (!running || canSteer);
 
   function pickCommand(cmd) {
     const text = `/${cmd.name}`;
@@ -104,16 +115,25 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
 
   function onPaste(e) {
     const files = e.clipboardData?.files;
-    if (files?.length && !running) {
+    if (files?.length && !running && !voice.recording) {
       e.preventDefault();
       add(files);
     }
   }
 
   const placeholder = running ? (canSteer ? t('composer.steerPlaceholder') : t('composer.waitPlaceholder')) : t('composer.placeholder');
-  const hint = running
+  const recordHint = voice.recording
+    ? t('composer.recording', { time: clock(voice.seconds) })
+    : voice.notice === 'denied'
+      ? t('composer.recordDenied')
+      : voice.notice === 'unsupported'
+        ? t('composer.recordUnsupported')
+        : voice.notice === 'limit'
+          ? t('composer.recordLimit', { max: humanSize(maxUploadBytes || 50 * 1024 * 1024) })
+          : '';
+  const hint = recordHint || (running
     ? (items.length ? t('composer.attachLater') : t('composer.steerHint'))
-    : uploading ? t('composer.waitUploads') : failed ? t('composer.fixFailed') : t('composer.hint');
+    : uploading ? t('composer.waitUploads') : failed ? t('composer.fixFailed') : t('composer.hint'));
 
   return (
     <div class="border-top p-2 p-md-3 bg-body">
@@ -154,13 +174,34 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
         <button
           type="button"
           class="btn btn-outline-secondary"
-          disabled={running}
+          disabled={running || voice.recording}
           onClick={() => picker.current?.click()}
           title={running ? t('composer.attachLater') : t('composer.attach')}
           aria-label={t('composer.attach')}
         >
           <i class="bi bi-paperclip" aria-hidden="true"></i>
         </button>
+        {voice.recording ? (
+          <>
+            <button type="button" class="btn btn-danger" onClick={voice.stop} title={t('composer.recordStop')} aria-label={t('composer.recordStop')}>
+              <i class="bi bi-stop-fill" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" onClick={voice.cancel} title={t('composer.recordCancel')} aria-label={t('composer.recordCancel')}>
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            disabled={running}
+            onClick={voice.start}
+            title={t('composer.record')}
+            aria-label={t('composer.record')}
+          >
+            <i class="bi bi-mic" aria-hidden="true"></i>
+          </button>
+        )}
         <textarea
           ref={ref}
           class="form-control"
@@ -210,7 +251,7 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
             ))}
           </select>
         )}
-        <div class={`form-text m-0 text-truncate ${failed && !running ? 'text-danger' : ''} ${items.length ? '' : 'd-none d-md-block'}`}>{hint}</div>
+        <div class={`form-text m-0 text-truncate ${(voice.notice && !voice.recording) || (failed && !running) ? 'text-danger' : ''} ${items.length || voice.recording || voice.notice ? '' : 'd-none d-md-block'}`}>{hint}</div>
       </div>
     </div>
   );
