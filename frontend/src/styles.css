@@ -202,8 +202,14 @@ body,
 }
 
 .composer textarea {
+  flex: 1 1 auto;
+  min-width: 0;
   resize: none;
   max-height: 240px;
+}
+
+.composer > .btn {
+  flex-shrink: 0;
 }
 
 .model-select {

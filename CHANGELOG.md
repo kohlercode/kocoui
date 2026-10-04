@@ -4,6 +4,10 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-04
+
+- The Send button submits the draft. A long message stays in the field instead of pushing the button out of the row.
+
 ## [0.2.0] - 2026-10-03
 
 - Added an informal Spanish UI locale.

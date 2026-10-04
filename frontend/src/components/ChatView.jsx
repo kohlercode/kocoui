@@ -127,7 +127,7 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
   };
 
   async function submit(overrideText) {
-    const text = (overrideText ?? draft).trim();
+    const text = (typeof overrideText === 'string' ? overrideText : draft).trim();
     if (running) {
       if (!text) return;
       setError('');

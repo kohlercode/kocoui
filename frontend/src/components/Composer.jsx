@@ -181,7 +181,7 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
         <button
           class={`btn ${running ? 'btn-outline-primary' : 'btn-primary'}`}
           disabled={!canSend}
-          onClick={onSubmit}
+          onClick={() => onSubmit()}
           title={running ? t('composer.steer') : t('composer.send')}
         >
           {busy || (uploading && !running) ? (
