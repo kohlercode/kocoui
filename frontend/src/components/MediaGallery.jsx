@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { api } from '../api.js';
 import { useI18n } from '../i18n/index.js';
 import { fileMeta } from '../media.js';
 import { fileIcon, humanSize } from '../uploads.js';
 import { openLightbox } from '../lightbox.js';
+import { WAVE_MAX_BYTES } from '../waveform.js';
+import { AudioWave } from './AudioWave.jsx';
 
 const MAX_TILES = 6;
 
@@ -72,6 +74,26 @@ export function MediaTile({ file, onOpen, sizes, more = 0, single = false }) {
 export function FileCard({ file, compact = false }) {
   const { t } = useI18n();
   const name = file.name || file.path?.split('/').pop() || '?';
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  const audioMessage = file.kind === 'audio' && !compact && !file.missing;
+
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    function onPointer(e) {
+      if (!menuRef.current?.contains(e.target)) setMenuOpen(false);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') setMenuOpen(false);
+    }
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
+
   if (file.missing) {
     return (
       <div class="file-card is-missing" title={file.path}>
@@ -86,25 +108,54 @@ export function FileCard({ file, compact = false }) {
   const ext = name.includes('.') ? name.split('.').pop().toUpperCase().slice(0, 6) : '';
   const viewable = file.kind === 'pdf' || file.mime === 'text/plain';
   return (
-    <div class={`file-card kind-${file.kind} ${compact ? 'is-compact' : ''}`}>
-      <div class="d-flex align-items-center gap-2 w-100 min-w-0">
-        <div class="file-card-icon"><i class={`bi ${fileIcon(file.mime, file.kind)}`} aria-hidden="true"></i></div>
-        <div class="min-w-0 flex-grow-1">
-          <div class="file-card-name text-truncate" title={name}>{name}</div>
-          <div class="file-card-meta">{[ext, humanSize(file.size)].filter(Boolean).join(' · ')}</div>
+    <div class={`file-card kind-${file.kind} ${compact ? 'is-compact' : ''} ${audioMessage && menuOpen ? 'is-menu-open' : ''}`}>
+      {audioMessage && (
+        <div class="audio-card-menu" ref={menuRef}>
+          <button
+            type="button"
+            class="audio-card-more"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            aria-label={t('media.more')}
+            title={t('media.more')}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <i class="bi bi-caret-down-fill" aria-hidden="true"></i>
+          </button>
+          <ul class={`dropdown-menu dropdown-menu-end ${menuOpen ? 'show' : ''}`} role="menu">
+            <li>
+              <a class="dropdown-item" role="menuitem" href={`${file.url}&download=1`} download={name} onClick={() => setMenuOpen(false)}>
+                <i class="bi bi-download me-2" aria-hidden="true"></i>
+                {t('media.download')}
+              </a>
+            </li>
+          </ul>
         </div>
-        <div class="file-card-actions">
-          {viewable && (
-            <a class="btn btn-sm btn-link" href={file.url} target="_blank" rel="noopener" title={t('media.open')} aria-label={t('media.open')}>
-              <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+      )}
+      {!audioMessage && (
+        <div class="d-flex align-items-center gap-2 w-100 min-w-0">
+          <div class="file-card-icon"><i class={`bi ${fileIcon(file.mime, file.kind)}`} aria-hidden="true"></i></div>
+          <div class="min-w-0 flex-grow-1">
+            <div class="file-card-name text-truncate" title={name}>{name}</div>
+            <div class="file-card-meta">{[ext, humanSize(file.size)].filter(Boolean).join(' · ')}</div>
+          </div>
+          <div class="file-card-actions">
+            {viewable && (
+              <a class="btn btn-sm btn-link" href={file.url} target="_blank" rel="noopener" title={t('media.open')} aria-label={t('media.open')}>
+                <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+              </a>
+            )}
+            <a class="btn btn-sm btn-link" href={`${file.url}&download=1`} download={name} title={t('media.download')} aria-label={t('media.download')}>
+              <i class="bi bi-download" aria-hidden="true"></i>
             </a>
-          )}
-          <a class="btn btn-sm btn-link" href={`${file.url}&download=1`} download={name} title={t('media.download')} aria-label={t('media.download')}>
-            <i class="bi bi-download" aria-hidden="true"></i>
-          </a>
+          </div>
         </div>
-      </div>
-      {file.kind === 'audio' && !compact && <audio class="file-card-audio" src={file.url} controls preload="none"></audio>}
+      )}
+      {file.kind === 'audio' && !compact && (
+        file.size > 0 && file.size <= WAVE_MAX_BYTES
+          ? <AudioWave file={file} />
+          : <audio class="file-card-audio" src={file.url} controls preload="none"></audio>
+      )}
     </div>
   );
 }

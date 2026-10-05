@@ -4,6 +4,11 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-05
+
+- The composer is one rounded field. A plus button attaches files. The round button on the right records while the field is empty, and sends once there is text or a file. Stopping a recording sends that clip on its own; text already in the field stays.
+- Short audio in the chat plays as a waveform. A caret in the corner of the card downloads the file. Audio larger than 2 MB keeps the browser control.
+
 ## [0.3.0] - 2026-10-04
 
 - A record button in the composer captures a voice message and sends it as an audio file. The agent reads that file the same way it reads an uploaded mp3. A long take is stored as short blobs and stops before the upload limit.

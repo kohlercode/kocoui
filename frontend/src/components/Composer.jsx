@@ -36,18 +36,24 @@ function AttachmentChip({ item, onRemove }) {
   );
 }
 
-export function Composer({ value, onChange, onSubmit, onStop, busy, running, canSteer, models, choices, model, onModelChange, attachments, maxUploadBytes }) {
+export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, running, canSteer, models, choices, model, onModelChange, attachments, maxUploadBytes }) {
   const { t } = useI18n();
   const ref = useRef(null);
   const picker = useRef(null);
   const menuRef = useRef(null);
   const { items, add, remove, uploading, failed, ready } = attachments;
+  const [sendingVoice, setSendingVoice] = useState(false);
   const voice = useVoiceRecorder({
     maxBytes: maxUploadBytes || 50 * 1024 * 1024,
-    onClip: (file) => add([file]),
+    onClip: (file) => {
+      setSendingVoice(true);
+      Promise.resolve(onVoice(file)).finally(() => setSendingVoice(false));
+    },
   });
   const matches = running ? [] : matchingCommands(value);
   const [active, setActive] = useState(0);
+  const [addOpen, setAddOpen] = useState(false);
+  const addRef = useRef(null);
   const menuOpen = matches.length > 0;
 
   useEffect(() => {
@@ -67,9 +73,31 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
     node?.scrollIntoView({ block: 'nearest' });
   }, [active, menuOpen]);
 
-  const hasContent = value.trim() !== '' || (!running && ready.length > 0);
+  useEffect(() => {
+    if (menuOpen) setAddOpen(false);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!addOpen) return;
+    function onPointer(e) {
+      if (!addRef.current?.contains(e.target)) setAddOpen(false);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') setAddOpen(false);
+    }
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [addOpen]);
+
+  const typed = value.trim() !== '';
+  const hasContent = typed || (!running && ready.length > 0);
   const blocked = !running && (uploading || failed);
   const canSend = !busy && !voice.recording && hasContent && !blocked && (!running || canSteer);
+  const showMic = !voice.recording && !running && !typed && items.length === 0;
 
   function pickCommand(cmd) {
     const text = `/${cmd.name}`;
@@ -131,9 +159,13 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
         : voice.notice === 'limit'
           ? t('composer.recordLimit', { max: humanSize(maxUploadBytes || 50 * 1024 * 1024) })
           : '';
-  const hint = recordHint || (running
-    ? (items.length ? t('composer.attachLater') : t('composer.steerHint'))
-    : uploading ? t('composer.waitUploads') : failed ? t('composer.fixFailed') : t('composer.hint'));
+  const hint = voice.recording
+    ? t('composer.recording', { time: clock(voice.seconds) })
+    : sendingVoice
+      ? t('composer.sendingVoice')
+      : recordHint || (running
+        ? (items.length ? t('composer.attachLater') : t('composer.steerHint'))
+        : uploading ? t('composer.waitUploads') : failed ? t('composer.fixFailed') : t('composer.hint'));
 
   return (
     <div class="border-top p-2 p-md-3 bg-body">
@@ -142,7 +174,7 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
           {items.map((item) => <AttachmentChip key={item.key} item={item} onRemove={remove} />)}
         </div>
       )}
-      <div class="d-flex gap-2 align-items-end composer position-relative">
+      <div class="composer position-relative">
         {menuOpen && (
           <ul class="command-menu list-unstyled mb-0" role="listbox" aria-label={t('cmd.menu')} ref={menuRef}>
             {matches.map((cmd, i) => (
@@ -161,77 +193,101 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
             ))}
           </ul>
         )}
-        <input
-          ref={picker}
-          type="file"
-          multiple
-          class="d-none"
-          onChange={(e) => {
-            add(e.currentTarget.files);
-            e.currentTarget.value = '';
-          }}
-        />
-        <button
-          type="button"
-          class="btn btn-outline-secondary"
-          disabled={running || voice.recording}
-          onClick={() => picker.current?.click()}
-          title={running ? t('composer.attachLater') : t('composer.attach')}
-          aria-label={t('composer.attach')}
-        >
-          <i class="bi bi-paperclip" aria-hidden="true"></i>
-        </button>
-        {voice.recording ? (
-          <>
-            <button type="button" class="btn btn-danger" onClick={voice.stop} title={t('composer.recordStop')} aria-label={t('composer.recordStop')}>
-              <i class="bi bi-stop-fill" aria-hidden="true"></i>
+        <div class="composer-box">
+          <input
+            ref={picker}
+            type="file"
+            multiple
+            class="d-none"
+            onChange={(e) => {
+              add(e.currentTarget.files);
+              e.currentTarget.value = '';
+            }}
+          />
+          <div class="dropup" ref={addRef}>
+            <button
+              type="button"
+              class="composer-round composer-plus"
+              disabled={running || voice.recording}
+              aria-expanded={addOpen}
+              aria-haspopup="menu"
+              aria-controls="composer-add-menu"
+              aria-label={t('composer.add')}
+              title={running ? t('composer.attachLater') : t('composer.add')}
+              onClick={() => setAddOpen((open) => !open)}
+            >
+              <i class="bi bi-plus-lg" aria-hidden="true"></i>
             </button>
-            <button type="button" class="btn btn-outline-secondary" onClick={voice.cancel} title={t('composer.recordCancel')} aria-label={t('composer.recordCancel')}>
+            <ul id="composer-add-menu" class={`dropdown-menu composer-add-menu ${addOpen ? 'show' : ''}`} role="menu">
+              <li>
+                <button
+                  type="button"
+                  class="dropdown-item"
+                  role="menuitem"
+                  onClick={() => {
+                    setAddOpen(false);
+                    picker.current?.click();
+                  }}
+                >
+                  <i class="bi bi-paperclip me-2" aria-hidden="true"></i>
+                  {t('composer.attach')}
+                </button>
+              </li>
+            </ul>
+          </div>
+          <textarea
+            ref={ref}
+            class="form-control"
+            rows={1}
+            placeholder={placeholder}
+            value={value}
+            disabled={running && !canSteer}
+            onInput={(e) => {
+              setAddOpen(false);
+              onChange(e.currentTarget.value);
+            }}
+            onKeyDown={onKeyDown}
+            onPaste={onPaste}
+          />
+          {voice.recording && (
+            <button type="button" class="composer-round composer-ghost" onClick={voice.cancel} title={t('composer.recordCancel')} aria-label={t('composer.recordCancel')}>
               <i class="bi bi-x-lg" aria-hidden="true"></i>
             </button>
-          </>
-        ) : (
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            disabled={running}
-            onClick={voice.start}
-            title={t('composer.record')}
-            aria-label={t('composer.record')}
-          >
-            <i class="bi bi-mic" aria-hidden="true"></i>
-          </button>
-        )}
-        <textarea
-          ref={ref}
-          class="form-control"
-          rows={1}
-          placeholder={placeholder}
-          value={value}
-          disabled={running && !canSteer}
-          onInput={(e) => onChange(e.currentTarget.value)}
-          onKeyDown={onKeyDown}
-          onPaste={onPaste}
-        />
-        {running && (
-          <button class="btn btn-outline-danger" onClick={onStop} title={t('composer.stop')}>
-            <i class="bi bi-stop-fill" aria-hidden="true"></i>
-            <span class="d-none d-md-inline ms-1">{t('composer.stop')}</span>
-          </button>
-        )}
-        <button
-          class={`btn ${running ? 'btn-outline-primary' : 'btn-primary'}`}
-          disabled={!canSend}
-          onClick={() => onSubmit()}
-          title={running ? t('composer.steer') : t('composer.send')}
-        >
-          {busy || (uploading && !running) ? (
-            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-          ) : (
-            <i class={running ? 'bi bi-signpost-2' : 'bi bi-send'} aria-hidden="true"></i>
           )}
-          <span class="d-none d-md-inline ms-1">{running ? t('composer.steer') : t('composer.send')}</span>
-        </button>
+          {running && (
+            <button type="button" class="composer-round btn btn-outline-danger" onClick={onStop} title={t('composer.stop')} aria-label={t('composer.stop')}>
+              <i class="bi bi-stop-fill" aria-hidden="true"></i>
+            </button>
+          )}
+          {voice.recording ? (
+            <button type="button" class="composer-round btn btn-primary" onClick={voice.stop} title={t('composer.recordSend')} aria-label={t('composer.recordSend')}>
+              <i class="bi bi-send-fill composer-send-icon" aria-hidden="true"></i>
+            </button>
+          ) : showMic ? (
+            <button type="button" class="composer-round btn btn-primary" disabled={sendingVoice || busy} onClick={voice.start} title={t('composer.record')} aria-label={t('composer.record')}>
+              {sendingVoice ? (
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              ) : (
+                <i class="bi bi-mic-fill" aria-hidden="true"></i>
+              )}
+            </button>
+          ) : (typed || items.length > 0) && (
+            <button
+              type="button"
+              class="composer-round btn btn-primary"
+              disabled={!canSend}
+              onClick={() => onSubmit()}
+              title={running ? t('composer.steer') : t('composer.send')}
+              aria-label={running ? t('composer.steer') : t('composer.send')}
+            >
+              {!sendingVoice && (busy || (uploading && !running)) ? (
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              ) : (
+                <i class={running ? 'bi bi-signpost-2' : 'bi bi-send-fill composer-send-icon'} aria-hidden="true"></i>
+              )}
+            </button>
+          )}
+        </div>
       </div>
       <div class="d-flex align-items-center gap-2 mt-1">
         {choices.length > 0 && (
@@ -251,7 +307,7 @@ export function Composer({ value, onChange, onSubmit, onStop, busy, running, can
             ))}
           </select>
         )}
-        <div class={`form-text m-0 text-truncate ${(voice.notice && !voice.recording) || (failed && !running) ? 'text-danger' : ''} ${items.length || voice.recording || voice.notice ? '' : 'd-none d-md-block'}`}>{hint}</div>
+        <div class={`form-text m-0 text-truncate ${(voice.notice && !voice.recording && !sendingVoice) || (failed && !running) ? 'text-danger' : ''} ${items.length || voice.recording || voice.notice || sendingVoice ? '' : 'd-none d-md-block'}`}>{hint}</div>
       </div>
     </div>
   );

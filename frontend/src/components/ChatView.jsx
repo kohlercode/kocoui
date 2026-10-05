@@ -8,8 +8,8 @@ import { Message } from './Message.jsx';
 import { LiveRun, RunNotice } from './LiveRun.jsx';
 import { Composer } from './Composer.jsx';
 import { hasFiles, useAttachments } from '../attachments.js';
-import { humanSize } from '../uploads.js';
-import { withAttachments } from '../media.js';
+import { deleteUpload, humanSize, uploadFile } from '../uploads.js';
+import { primeFileMeta, withAttachments } from '../media.js';
 import { FilesPanel, conversationFiles } from './FilesPanel.jsx';
 import { COMMANDS, parseSlash, resolveCommand } from '../commands.js';
 
@@ -189,6 +189,40 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
     }
   }
 
+  // A finished recording is its own message. The draft and any other attachments stay.
+  async function sendVoice(file) {
+    if (running || busy) return;
+    setError('');
+    setBusy(true);
+    setNotice(null);
+    let info = null;
+    try {
+      const uploaded = await uploadFile(file).promise;
+      info = uploaded;
+      primeFileMeta(info);
+      const res = await api('POST', '/api/runs', {
+        input: '',
+        session_id: sessionId || '',
+        model: effectiveModel,
+        attachments: [info.id],
+      }, { 'Idempotency-Key': newIdempotencyKey() });
+      const sid = res.session_id;
+      if (!sessionId) {
+        setSessionId(sid);
+        onSessionCreated(sid);
+      }
+      setMessages((m) => [...m, { id: `local-${Date.now()}`, role: 'user', content: withAttachments('', [info]) }]);
+      stick.current = true;
+      rememberRun(sid, res.run_id);
+      attach(res.run_id, sid);
+    } catch (e) {
+      if (info?.id) deleteUpload(info.id);
+      setError(errorText(t, e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function noteSystem(content) {
     stick.current = true;
     setMessages((m) => [...m, { id: `cmd-${Date.now()}`, role: 'system', content }]);
@@ -342,6 +376,7 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
         value={draft}
         onChange={setDraft}
         onSubmit={submit}
+        onVoice={sendVoice}
         onStop={stop}
         busy={busy}
         running={running}
