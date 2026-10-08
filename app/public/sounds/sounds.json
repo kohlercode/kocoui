@@ -1,0 +1,7 @@
+{
+  "click": "crisp-click.m4a",
+  "send": "outgoing-message.m4a",
+  "reply": "cute-blip.m4a",
+  "approval": "soft-click.m4a",
+  "error": "error-beep.m4a"
+}

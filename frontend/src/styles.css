@@ -27,9 +27,15 @@ body,
   font-variant-numeric: tabular-nums;
 }
 
-/* Keep the settings menu above the chat pane. */
+/* Keep the settings menu above the chat pane.
+   dropdown-menu-end only shifts the menu when Popper sets data-bs-popper. */
 .navbar {
   z-index: 1020;
+}
+
+.navbar .dropdown-menu-end {
+  right: 0;
+  left: auto;
 }
 
 .app-version {

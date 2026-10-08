@@ -27,6 +27,8 @@
   "nav.push.unsupported": "Este navegador no admite notificaciones push.",
   "nav.push.disabled": "Las notificaciones push no están configuradas en el servidor.",
   "nav.push.error": "No se pudieron activar las notificaciones ({code}).",
+  "nav.sounds.on": "Activar sonidos",
+  "nav.sounds.off": "Desactivar sonidos",
 
   "theme.title": "Colores",
   "theme.mode": "Esquema de color",

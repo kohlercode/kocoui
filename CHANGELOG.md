@@ -4,6 +4,13 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-08
+
+- Interface sounds stay off until you turn them on in settings. Sending, a finished reply, an approval, and an error each play a cue. The files live in `public/sounds` and can be swapped without a rebuild.
+- The settings menu lines up with the right edge of its button.
+- On a small screen the header hides the app name and version, and the controls keep the normal button size.
+- A few German labels are more informal.
+
 ## [0.5.0] - 2026-10-08
 
 - The sidebar splits chats you started from sessions the agent started, such as a cron run. Agent chats stay collapsed until you open them.

@@ -1,13 +1,25 @@
+import { useEffect, useRef } from 'preact/hooks';
 import { useI18n } from '../i18n/index.js';
 import { Markdown } from './Message.jsx';
 import { ApprovalCard } from './ApprovalCard.jsx';
 import { extractFiles } from '../media.js';
+import { play } from '../sounds.js';
 
 export function LiveRun({ run, onApprove }) {
   const { t } = useI18n();
+  const heard = useRef('');
   const waiting = !run.text && run.tools.length === 0 && !run.approval;
   // The files appear with the final transcript; while streaming only the tags are hidden.
   const text = extractFiles('assistant', run.text || '').text;
+  const approvalKey = run.approval
+    ? String(run.approval.request_id || run.approval.command || 'pending')
+    : '';
+
+  useEffect(() => {
+    if (!approvalKey || heard.current === approvalKey) return;
+    heard.current = approvalKey;
+    play('approval');
+  }, [approvalKey]);
 
   return (
     <div class="mb-3">

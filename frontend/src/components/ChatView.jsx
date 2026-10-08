@@ -12,6 +12,7 @@ import { deleteUpload, humanSize, uploadFile } from '../uploads.js';
 import { primeFileMeta, withAttachments } from '../media.js';
 import { FilesPanel, conversationFiles } from './FilesPanel.jsx';
 import { COMMANDS, parseSlash, resolveCommand } from '../commands.js';
+import { play } from '../sounds.js';
 
 export function ChatView({ initialSessionId, models, limits, onSessionCreated, onRunFinished, onNewChat }) {
   const { t } = useI18n();
@@ -53,8 +54,9 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
       const pending = final.terminal?.pending_steer;
       if (final.status !== 'completed') {
         setNotice({ kind: final.status, error: final.terminal?.error || '' });
-      } else if (pending) {
-        setNotice({ kind: 'pending_steer' });
+      } else {
+        play('reply');
+        if (pending) setNotice({ kind: 'pending_steer' });
       }
       if (pending) setDraft((d) => d || pending);
       onRunFinished();
@@ -152,6 +154,7 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
         setDraft('');
       } catch (e) {
         setError(errorText(t, e));
+        play('error');
       } finally {
         setBusy(false);
       }
@@ -182,8 +185,10 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
       stick.current = true;
       rememberRun(sid, res.run_id);
       attach(res.run_id, sid);
+      play('send');
     } catch (e) {
       setError(errorText(t, e));
+      play('error');
     } finally {
       setBusy(false);
     }
@@ -215,9 +220,11 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
       stick.current = true;
       rememberRun(sid, res.run_id);
       attach(res.run_id, sid);
+      play('send');
     } catch (e) {
       if (info?.id) deleteUpload(info.id);
       setError(errorText(t, e));
+      play('error');
     } finally {
       setBusy(false);
     }
@@ -307,6 +314,7 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
       setDraft('');
     } catch (e) {
       setError(errorText(t, e));
+      play('error');
     } finally {
       setBusy(false);
     }
@@ -317,6 +325,7 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
       await tracker.current?.stop();
     } catch (e) {
       setError(errorText(t, e));
+      play('error');
     }
   }
 

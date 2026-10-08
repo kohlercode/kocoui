@@ -11,6 +11,7 @@ import { ToolsView } from './ToolsView.jsx';
 import { JobsView } from './JobsView.jsx';
 import { PersonaView } from './PersonaView.jsx';
 import { disablePush, enablePush, pushPrefOn, pushSupported } from '../push.js';
+import { play, setSoundsEnabled, soundsEnabled } from '../sounds.js';
 
 function sessionFromHash() {
   const m = location.hash.match(/^#\/s\/(.+)$/);
@@ -38,6 +39,7 @@ export function Layout({ user, onLoggedOut }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pushOn, setPushOn] = useState(pushPrefOn);
   const [pushBusy, setPushBusy] = useState(false);
+  const [soundsOn, setSoundsOn] = useState(soundsEnabled);
   const settingsRef = useRef(null);
   const [features, setFeatures] = useState({});
   const [models, setModels] = useState(null);
@@ -184,21 +186,21 @@ export function Layout({ user, onLoggedOut }) {
     <div class="d-flex flex-column h-100">
       <nav class="navbar border-bottom bg-body-tertiary px-2 px-md-3 flex-nowrap">
         <div class="d-flex align-items-center gap-2 min-w-0">
-          <button class="btn btn-sm btn-outline-secondary d-md-none" onClick={() => setSidebarOpen((o) => !o)} aria-label={t('nav.sessions')}>
+          <button class="btn btn-outline-secondary d-md-none" onClick={() => setSidebarOpen((o) => !o)} aria-label={t('nav.sessions')}>
             <i class="bi bi-list" aria-hidden="true"></i>
           </button>
-          <span class="navbar-brand mb-0 h1 text-truncate">
+          <span class="navbar-brand mb-0 h1 text-truncate d-none d-lg-inline">
             <i class="bi bi-robot me-2" aria-hidden="true"></i>
             {appName}
           </span>
           {appVersion && (
-            <span class="app-version" aria-label={t('nav.version', { version: appVersion })}>
+            <span class="app-version d-none d-lg-inline" aria-label={t('nav.version', { version: appVersion })}>
               {appVersion}
             </span>
           )}
         </div>
         <div class="d-flex align-items-center gap-2">
-          <div class="btn-group btn-group-sm" role="group" aria-label={t('nav.views')}>
+          <div class="btn-group" role="group" aria-label={t('nav.views')}>
             <button class={`btn ${view === 'chat' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('chat')} title={t('nav.chat')}>
               <i class="bi bi-chat-left-text" aria-hidden="true"></i>
               <span class="d-none d-lg-inline ms-1">{t('nav.chat')}</span>
@@ -222,7 +224,7 @@ export function Layout({ user, onLoggedOut }) {
           <div class="dropdown" ref={settingsRef}>
             <button
               type="button"
-              class="btn btn-sm btn-outline-secondary dropdown-toggle"
+              class="btn btn-outline-secondary dropdown-toggle"
               aria-expanded={settingsOpen}
               aria-haspopup="menu"
               aria-label={t('nav.settings')}
@@ -275,13 +277,30 @@ export function Layout({ user, onLoggedOut }) {
                   </button>
                 </li>
               )}
+              <li>
+                <button
+                  type="button"
+                  class="dropdown-item"
+                  role="menuitem"
+                  onClick={() => {
+                    const next = !soundsOn;
+                    setSoundsEnabled(next);
+                    setSoundsOn(next);
+                    setSettingsOpen(false);
+                    if (next) play('click');
+                  }}
+                >
+                  <i class={`bi ${soundsOn ? 'bi-volume-up' : 'bi-volume-mute'} me-2`} aria-hidden="true"></i>
+                  {soundsOn ? t('nav.sounds.off') : t('nav.sounds.on')}
+                </button>
+              </li>
             </ul>
           </div>
           <span class="text-body-secondary small d-none d-lg-inline">
             <i class="bi bi-person-circle me-1" aria-hidden="true"></i>
             {user.username}
           </span>
-          <button class="btn btn-sm btn-outline-danger" onClick={logout} title={t('nav.logout')}>
+          <button class="btn btn-outline-danger" onClick={logout} title={t('nav.logout')}>
             <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
             <span class="d-none d-md-inline ms-1">{t('nav.logout')}</span>
           </button>

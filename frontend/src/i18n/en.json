@@ -27,6 +27,8 @@
   "nav.push.unsupported": "This browser does not support push notifications.",
   "nav.push.disabled": "Push notifications are not configured on the server.",
   "nav.push.error": "Could not enable notifications ({code}).",
+  "nav.sounds.on": "Enable sounds",
+  "nav.sounds.off": "Disable sounds",
 
   "theme.title": "Colors",
   "theme.mode": "Color scheme",

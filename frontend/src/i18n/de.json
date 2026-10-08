@@ -1,6 +1,6 @@
 {
   "common.loading": "Wird geladen …",
-  "common.retry": "Erneut versuchen",
+  "common.retry": "Nochmal versuchen",
   "common.save": "Speichern",
   "common.error.network": "Der Server ist nicht erreichbar.",
   "common.error.generic": "Etwas ist schiefgelaufen ({code}).",
@@ -27,6 +27,8 @@
   "nav.push.unsupported": "Dieser Browser unterstützt keine Push-Benachrichtigungen.",
   "nav.push.disabled": "Push-Benachrichtigungen sind auf dem Server nicht eingerichtet.",
   "nav.push.error": "Benachrichtigungen konnten nicht aktiviert werden ({code}).",
+  "nav.sounds.on": "Töne einschalten",
+  "nav.sounds.off": "Töne ausschalten",
 
   "theme.title": "Farben",
   "theme.mode": "Farbschema",
@@ -46,10 +48,10 @@
   "theme.cancel": "Abbrechen",
   "theme.save": "Speichern",
   "nav.language": "Sprache",
-  "nav.sessions": "Unterhaltungen",
+  "nav.sessions": "Chats",
   "nav.views": "Ansichten",
   "nav.chat": "Chat",
-  "nav.tools": "Werkzeuge & Skills",
+  "nav.tools": "Tools & Skills",
   "nav.jobs": "Geplante Aufgaben",
   "nav.persona": "Persönlichkeit",
 
@@ -97,7 +99,7 @@
   "sessions.delete": "Löschen",
   "sessions.deleteConfirm": "Unterhaltung „{title}“ löschen? Sie wird aus dem Verlauf des Agenten entfernt.",
 
-  "chat.empty": "Beginne eine Unterhaltung mit dem Agenten.",
+  "chat.empty": "Starte eine Unterhaltung mit dem Agenten.",
   "chat.toolResult": "Ergebnis von {tool}",
   "chat.status.working": "Der Agent arbeitet …",
   "chat.status.approval": "Wartet auf deine Freigabe",
@@ -105,7 +107,7 @@
   "chat.status.queued": "In der Warteschlange …",
   "chat.steered": "{n}× Hinweis zugestellt",
   "chat.notice.cancelled": "Von dir gestoppt. Der Agent hat diesen Schritt nicht beendet.",
-  "chat.notice.failed": "Der Schritt ist fehlgeschlagen.",
+  "chat.notice.failed": "Uuups, der Schritt ist fehlgeschlagen.",
   "chat.notice.interrupted": "Der Schritt wurde unterbrochen (der Agent-Dienst wurde neu gestartet).",
   "chat.notice.lost": "Der Lauf wird vom Agenten nicht mehr verfolgt; der Verlauf zeigt, was gespeichert wurde.",
   "chat.notice.pending_steer": "Dein letzter Hinweis kam nach der Antwort an. Er steht im Eingabefeld – sende ihn als nächste Nachricht.",
