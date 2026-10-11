@@ -12,6 +12,12 @@ Hermes Agent is a long-running agent with a shell, files, memory, and skills. Pe
 
 Install with the scripts in this repo, on an Ubuntu VPS where Hermes is already running. Steps: [docs/install.md](docs/install.md).
 
+## Demo
+
+A static demo of this interface, filled with example conversations, is published from `main` to GitHub Pages at `https://<owner>.github.io/<repo>/`. It uses the same screens as the app. Actions that would send a message or change data open a note instead.
+
+The site updates when a push to `main` changes `frontend/` or `demo/`. In the repository settings, set Pages to deploy from GitHub Actions. A custom domain is optional: set the repository variable `DEMO_BASE` to `/` and add the hostname in the Pages settings. The hostname stays out of this repo.
+
 ## Status
 
 Version 0.x, for a single operator. Users are created with `bin/kocoui user:add`. There is no self-registration and no password reset in the browser. Push notifications are best-effort: a timer drops a run from the queue after 30 minutes. Signing in does not sandbox the agent.

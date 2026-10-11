@@ -1,0 +1,7 @@
+[
+  { "id": "sess_markdown", "title": "Markdown reply", "ago": 180 },
+  { "id": "sess_files", "title": "Files and album", "ago": 2400 },
+  { "id": "sess_tools", "title": "Tool result", "ago": 7200 },
+  { "id": "sess_approval", "title": "Waiting for approval", "ago": 45 },
+  { "id": "sess_cli", "title": "Started from the terminal", "source": "cli", "ago": 90000 }
+]

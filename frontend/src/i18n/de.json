@@ -5,6 +5,14 @@
   "common.error.network": "Der Server ist nicht erreichbar.",
   "common.error.generic": "Etwas ist schiefgelaufen ({code}).",
 
+  "demo.banner": "Das ist die echte Oberfläche mit Beispielinhalten. Hier wird nichts gespeichert.",
+  "demo.login": "Anmeldung ansehen",
+  "demo.back": "Zurück zur Demo",
+  "demo.note.title": "Das ist eine Demo",
+  "demo.note.body": "Diese Aktion gibt es hier nicht. Die Demo zeigt die Oberfläche mit Beispielinhalten. Eine Nachricht senden, eine Datei hochladen oder etwas ändern, das den Agenten braucht, passiert nicht.",
+  "demo.note.close": "Schließen",
+  "demo.note.short": "Diese Demo ändert nichts.",
+
   "login.title": "Anmelden",
   "login.username": "Benutzername",
   "login.password": "Passwort",

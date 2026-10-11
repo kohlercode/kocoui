@@ -5,6 +5,14 @@
   "common.error.network": "No se puede conectar con el servidor.",
   "common.error.generic": "Algo salió mal ({code}).",
 
+  "demo.banner": "Esta es la interfaz real con contenido de ejemplo. Aquí no se guarda nada.",
+  "demo.login": "Ver el inicio de sesión",
+  "demo.back": "Volver a la demo",
+  "demo.note.title": "Esto es una demo",
+  "demo.note.body": "Esa acción no está disponible aquí. La demo muestra la interfaz con contenido de ejemplo. Enviar un mensaje, subir un archivo o cambiar algo que habla con un agente no hace nada.",
+  "demo.note.close": "Cerrar",
+  "demo.note.short": "Esta demo no cambia nada.",
+
   "login.title": "Iniciar sesión",
   "login.username": "Usuario",
   "login.password": "Contraseña",

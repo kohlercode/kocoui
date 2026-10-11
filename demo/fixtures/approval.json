@@ -1,0 +1,6 @@
+{
+  "request_id": "req_demo",
+  "command": "rm /demo/outbox/export-2024.zip",
+  "description": "Delete a file in the conversation outbox.",
+  "choices": ["once", "session", "always", "deny"]
+}

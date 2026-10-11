@@ -2,6 +2,7 @@ node_modules/
 .cursor/
 deploy/selftest.sh
 app/public/assets/
+demo/dist/
 app/config/config.php
 app/var/
 *.local

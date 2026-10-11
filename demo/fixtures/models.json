@@ -1,0 +1,15 @@
+{
+  "current": { "provider": "example", "model": "example-chat" },
+  "providers": [
+    {
+      "slug": "example",
+      "name": "Example",
+      "models": ["example-chat", "example-small"]
+    },
+    {
+      "slug": "sample",
+      "name": "Sample",
+      "models": ["sample-reason"]
+    }
+  ]
+}

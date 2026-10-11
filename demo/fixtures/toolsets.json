@@ -1,0 +1,36 @@
+{
+  "data": [
+    {
+      "name": "files",
+      "label": "Files",
+      "description": "Read and write files in the conversation folders.",
+      "enabled": true,
+      "configured": true,
+      "tools": ["read_file", "write_file", "search_files"]
+    },
+    {
+      "name": "terminal",
+      "label": "Terminal",
+      "description": "Run a command. Each command waits for approval.",
+      "enabled": true,
+      "configured": true,
+      "tools": ["terminal"]
+    },
+    {
+      "name": "web",
+      "label": "Web",
+      "description": "Search the web and fetch a page.",
+      "enabled": true,
+      "configured": true,
+      "tools": ["web_search", "web_extract"]
+    },
+    {
+      "name": "browser",
+      "label": "Browser",
+      "description": "Drive a browser. Not set up in this example.",
+      "enabled": false,
+      "configured": false,
+      "tools": ["browser_navigate", "browser_snapshot"]
+    }
+  ]
+}

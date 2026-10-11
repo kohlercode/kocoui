@@ -71,7 +71,18 @@ export class RunTracker {
   }
 
   connect() {
-    const es = new EventSource(`/api/runs/${encodeURIComponent(this.runId)}/events`);
+    const url = `/api/runs/${encodeURIComponent(this.runId)}/events`;
+    if (import.meta.env.VITE_DEMO) {
+      import('../../demo/run-stream.js').then(({ DemoEventSource }) => {
+        if (this.closed) return;
+        this.attachSource(new DemoEventSource(url));
+      });
+      return;
+    }
+    this.attachSource(new EventSource(url));
+  }
+
+  attachSource(es) {
     this.es = es;
     es.onmessage = (e) => {
       let ev;

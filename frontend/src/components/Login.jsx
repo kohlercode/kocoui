@@ -27,6 +27,7 @@ export function Login({ onSuccess }) {
         setError(t('login.error.throttled', { minutes: Math.max(1, Math.ceil((err.data?.retry_after || 60) / 60)) }));
       else if (err.code === 'invalid_input') setError(t('login.error.input'));
       else if (err.status === 0) setError(t('common.error.network'));
+      else if (err.code === 'demo_readonly') setError(t('demo.note.short'));
       else setError(t('common.error.generic', { code: err.code }));
     } finally {
       setBusy(false);

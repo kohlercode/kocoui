@@ -5,6 +5,14 @@
   "common.error.network": "The server cannot be reached.",
   "common.error.generic": "Something went wrong ({code}).",
 
+  "demo.banner": "This is the real interface with example content. Nothing here is saved.",
+  "demo.login": "Preview sign-in",
+  "demo.back": "Back to the demo",
+  "demo.note.title": "This is a demo",
+  "demo.note.body": "That action is not available here. The demo shows the interface with example content. Sending a message, uploading a file, or changing something that talks to an agent does nothing.",
+  "demo.note.close": "Close",
+  "demo.note.short": "This demo does not change anything.",
+
   "login.title": "Sign in",
   "login.username": "Username",
   "login.password": "Password",

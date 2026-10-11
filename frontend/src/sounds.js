@@ -29,8 +29,13 @@ document.addEventListener('pointerdown', () => {
   context();
 }, { capture: true });
 
+function soundUrl(path) {
+  const base = import.meta.env.VITE_DEMO ? import.meta.env.BASE_URL : '/';
+  return base + path.replace(/^\//, '');
+}
+
 async function load() {
-  const res = await fetch('/sounds/sounds.json', { credentials: 'same-origin', cache: 'no-store' });
+  const res = await fetch(soundUrl('/sounds/sounds.json'), { credentials: 'same-origin', cache: 'no-store' });
   if (!res.ok) throw new Error('sounds');
   const map = await res.json();
   const audio = context();
@@ -39,7 +44,7 @@ async function load() {
   if (map && typeof map === 'object') {
     for (const [name, file] of Object.entries(map)) {
       if (typeof file !== 'string' || !FILE_NAME.test(file)) continue;
-      jobs.push(fetch(`/sounds/${encodeURIComponent(file)}`, { credentials: 'same-origin' }).then(async (fileRes) => {
+      jobs.push(fetch(soundUrl(`/sounds/${encodeURIComponent(file)}`), { credentials: 'same-origin' }).then(async (fileRes) => {
         if (!fileRes.ok) return;
         const bytes = await fileRes.arrayBuffer();
         buffers.set(name, await audio.decodeAudioData(bytes.slice(0)));

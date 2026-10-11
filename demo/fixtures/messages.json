@@ -1,0 +1,69 @@
+{
+  "sess_markdown": [
+    {
+      "id": "md-1",
+      "role": "user",
+      "content": "Show me how a reply looks in this interface."
+    },
+    {
+      "id": "md-2",
+      "role": "assistant",
+      "content": "Replies are GitHub-flavored Markdown.\n\n- **Bold** and `inline code` stay in the bubble\n- Fenced blocks keep their language\n\n```js\nfunction hello(name) {\n  return `Hello, ${name}`;\n}\n```\n\n| Piece | Where it lives |\n| --- | --- |\n| Chat | This column |\n| Files | The album and the files panel |\n\n> Approvals stay manual. Nothing runs until you choose."
+    }
+  ],
+  "sess_files": [
+    {
+      "id": "f-1",
+      "role": "user",
+      "content": "Two pictures from the sample album.\n\n[Attached files]\n- /demo/inbox/shore.png (image/png, 3.1 KB)\n- /demo/inbox/cabin.png (image/png, 3.6 KB)"
+    },
+    {
+      "id": "f-2",
+      "role": "assistant",
+      "content": "Here are the other sample files: a short tone, a one-page PDF, and a path that is not on disk.\n\nMEDIA:/demo/outbox/note.wav\nMEDIA:/demo/outbox/notes.pdf\nMEDIA:/demo/outbox/missing.txt"
+    }
+  ],
+  "sess_tools": [
+    {
+      "id": "t-1",
+      "role": "user",
+      "content": "What is the weather in Lisbon right now?"
+    },
+    {
+      "id": "t-2",
+      "role": "assistant",
+      "content": "",
+      "tool_calls": [{ "name": "weather" }]
+    },
+    {
+      "id": "t-3",
+      "role": "tool",
+      "tool_name": "weather",
+      "content": "{\n  \"place\": \"Lisbon\",\n  \"condition\": \"clear\",\n  \"celsius\": 21\n}"
+    },
+    {
+      "id": "t-4",
+      "role": "assistant",
+      "content": "Lisbon is clear and about 21 °C. This result is example data from the demo fixtures."
+    }
+  ],
+  "sess_approval": [
+    {
+      "id": "a-1",
+      "role": "user",
+      "content": "Please remove the old export in the outbox."
+    }
+  ],
+  "sess_cli": [
+    {
+      "id": "c-1",
+      "role": "user",
+      "content": "Summarize the deploy steps in one line."
+    },
+    {
+      "id": "c-2",
+      "role": "assistant",
+      "content": "Build the frontend, then install the release on the server. This conversation is here so the terminal section of the list has something in it."
+    }
+  ]
+}

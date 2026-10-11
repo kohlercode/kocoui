@@ -11,6 +11,7 @@
     "test": "php tests/run.php",
     "dev": "vite",
     "build": "vite build",
+    "build:demo": "vite build --config vite.demo.config.js",
     "deploy": "node deploy/deploy.mjs",
     "backups": "node deploy/backups.mjs"
   },

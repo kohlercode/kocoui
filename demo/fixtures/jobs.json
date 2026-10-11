@@ -1,0 +1,20 @@
+[
+  {
+    "id": "job_digest",
+    "name": "Morning digest",
+    "schedule": "daily at 08:00",
+    "enabled": true,
+    "next_in": 18000,
+    "last_ago": 72000,
+    "last_status": "ok"
+  },
+  {
+    "id": "job_tidy",
+    "name": "Inbox tidy",
+    "schedule": "every 6 hours",
+    "enabled": false,
+    "next_in": null,
+    "last_ago": 5400,
+    "last_status": "error"
+  }
+]

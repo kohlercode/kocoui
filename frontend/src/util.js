@@ -43,6 +43,7 @@ export function errorText(t, e) {
     restart_pending: 'cmd.restart.pending',
     restart_cooldown: 'cmd.restart.cooldown',
     push_disabled: 'nav.push.disabled',
+    demo_readonly: 'demo.note.short',
   };
   const key = known[e?.code];
   const d = e?.data || e || {};

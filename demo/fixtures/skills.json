@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "name": "summarize",
+      "description": "Turn a long note into a short summary with the decisions kept.",
+      "category": "notes",
+      "enabled": true
+    },
+    {
+      "name": "demo-tour",
+      "description": "Walk through the screens of this interface using the sample conversations.",
+      "category": "meta",
+      "enabled": true
+    },
+    {
+      "name": "translate",
+      "description": "Translate a passage. Switched off in this example.",
+      "category": "language",
+      "enabled": false
+    }
+  ],
+  "available": true
+}

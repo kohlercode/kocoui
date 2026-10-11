@@ -1,0 +1,38 @@
+{
+  "/demo/inbox/shore.png": {
+    "name": "shore.png",
+    "size": 3175,
+    "mime": "image/png",
+    "kind": "image",
+    "origin": "upload",
+    "file": "media/shore.png",
+    "width": 640,
+    "height": 400
+  },
+  "/demo/inbox/cabin.png": {
+    "name": "cabin.png",
+    "size": 3737,
+    "mime": "image/png",
+    "kind": "image",
+    "origin": "upload",
+    "file": "media/cabin.png",
+    "width": 640,
+    "height": 400
+  },
+  "/demo/outbox/note.wav": {
+    "name": "note.wav",
+    "size": 26504,
+    "mime": "audio/wav",
+    "kind": "audio",
+    "origin": "agent",
+    "file": "media/note.wav"
+  },
+  "/demo/outbox/notes.pdf": {
+    "name": "notes.pdf",
+    "size": 591,
+    "mime": "application/pdf",
+    "kind": "pdf",
+    "origin": "agent",
+    "file": "media/notes.pdf"
+  }
+}

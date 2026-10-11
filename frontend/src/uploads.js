@@ -5,6 +5,10 @@ import { ApiError, api, csrf } from './api.js';
  * Returns { promise, abort }; the promise resolves to the server's file info.
  */
 export function uploadFile(file, onProgress) {
+  if (import.meta.env.VITE_DEMO) {
+    const promise = import('../../demo/note.js').then((m) => m.rejectDemo());
+    return { promise, abort() {} };
+  }
   const xhr = new XMLHttpRequest();
   const promise = new Promise((resolve, reject) => {
     xhr.open('PUT', '/api/uploads');

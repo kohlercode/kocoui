@@ -8,6 +8,10 @@ export default defineConfig(({ command }) => ({
   root,
   base: command === 'build' ? '/assets/' : '/',
   plugins: [preact()],
+  define: {
+    // False here so demo-only branches are stripped from the app bundle.
+    'import.meta.env.VITE_DEMO': 'false',
+  },
   build: {
     outDir: fileURLToPath(new URL('./app/public/assets', import.meta.url)),
     emptyOutDir: true,
