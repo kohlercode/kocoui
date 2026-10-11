@@ -60,7 +60,7 @@
   "nav.views": "Vistas",
   "nav.chat": "Chat",
   "nav.tools": "Herramientas y habilidades",
-  "nav.jobs": "Tareas programadas",
+  "nav.jobs": "Tareas",
   "nav.persona": "Persona",
 
   "persona.title": "Persona",
@@ -86,7 +86,7 @@
   "tools.noSkills": "No hay habilidades instaladas.",
   "tools.skillsUnavailable": "El agente no pudo listar sus habilidades. Es un fallo de la versión de Hermes instalada; las habilidades siguen funcionando en las conversaciones.",
 
-  "jobs.title": "Tareas programadas",
+  "jobs.title": "Tareas",
   "jobs.disabled": "Las tareas programadas no están activadas en este agente.",
   "jobs.empty": "No hay tareas programadas.",
   "jobs.name": "Nombre",

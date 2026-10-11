@@ -60,7 +60,7 @@
   "nav.views": "Views",
   "nav.chat": "Chat",
   "nav.tools": "Tools & skills",
-  "nav.jobs": "Scheduled jobs",
+  "nav.jobs": "Jobs",
   "nav.persona": "Persona",
 
   "persona.title": "Persona",
@@ -86,7 +86,7 @@
   "tools.noSkills": "No skills installed.",
   "tools.skillsUnavailable": "The agent could not list its skills. This is a bug in the installed Hermes version; the skills themselves still work in conversations.",
 
-  "jobs.title": "Scheduled jobs",
+  "jobs.title": "Jobs",
   "jobs.disabled": "Scheduled jobs are not enabled on this agent.",
   "jobs.empty": "No scheduled jobs.",
   "jobs.name": "Name",

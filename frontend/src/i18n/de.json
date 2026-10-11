@@ -60,7 +60,7 @@
   "nav.views": "Ansichten",
   "nav.chat": "Chat",
   "nav.tools": "Tools & Skills",
-  "nav.jobs": "Geplante Aufgaben",
+  "nav.jobs": "Jobs",
   "nav.persona": "Persönlichkeit",
 
   "persona.title": "Persönlichkeit",
@@ -86,7 +86,7 @@
   "tools.noSkills": "Keine Skills installiert.",
   "tools.skillsUnavailable": "Der Agent konnte seine Skills nicht auflisten. Das ist ein Fehler in der installierten Hermes-Version; die Skills selbst funktionieren in Unterhaltungen trotzdem.",
 
-  "jobs.title": "Geplante Aufgaben",
+  "jobs.title": "Jobs",
   "jobs.disabled": "Geplante Aufgaben sind bei diesem Agenten nicht aktiviert.",
   "jobs.empty": "Keine geplanten Aufgaben.",
   "jobs.name": "Name",
