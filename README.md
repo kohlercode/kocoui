@@ -14,9 +14,11 @@ Install with the scripts in this repo, on an Ubuntu VPS where Hermes is already 
 
 ## Demo
 
-A static demo of this interface, filled with example conversations, is published from `main` to GitHub Pages at `https://<owner>.github.io/<repo>/`. It uses the same screens as the app. Actions that would send a message or change data open a note instead.
+**[Try the demo](https://kohlercode.github.io/kocoui/)**
 
-The site updates when a push to `main` changes `frontend/` or `demo/`. In the repository settings, set Pages to deploy from GitHub Actions. A custom domain is optional: set the repository variable `DEMO_BASE` to `/` and add the hostname in the Pages settings. The hostname stays out of this repo.
+The demo is this interface: the same screens and styles, filled with example conversations. You can browse chats, files, tools, jobs, and the persona page, and you can switch the language and the theme. Sending a message, uploading a file, or anything else that would change data opens a note instead. The sample content stays as it is.
+
+A push to `main` that changes the interface publishes a new demo.
 
 ## Status
 

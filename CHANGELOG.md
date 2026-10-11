@@ -4,6 +4,11 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-11
+
+- A public demo of the interface is linked from the README. It uses example conversations. Actions that would change data open a note.
+- The jobs label is "Jobs". The language control is a globe menu.
+
 ## [0.6.0] - 2026-10-08
 
 - Interface sounds stay off until you turn them on in settings. Sending, a finished reply, an approval, and an error each play a cue. The files live in `public/sounds` and can be swapped without a rebuild.
