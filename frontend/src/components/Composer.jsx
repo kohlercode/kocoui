@@ -54,6 +54,8 @@ export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, run
   const [active, setActive] = useState(0);
   const [addOpen, setAddOpen] = useState(false);
   const addRef = useRef(null);
+  const [modelOpen, setModelOpen] = useState(false);
+  const modelRef = useRef(null);
   const menuOpen = matches.length > 0;
 
   useEffect(() => {
@@ -74,8 +76,15 @@ export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, run
   }, [active, menuOpen]);
 
   useEffect(() => {
-    if (menuOpen) setAddOpen(false);
+    if (menuOpen) {
+      setAddOpen(false);
+      setModelOpen(false);
+    }
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (running) setModelOpen(false);
+  }, [running]);
 
   useEffect(() => {
     if (!addOpen) return;
@@ -92,6 +101,40 @@ export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, run
       document.removeEventListener('keydown', onKey);
     };
   }, [addOpen]);
+
+  useEffect(() => {
+    if (!modelOpen) return;
+    function fit() {
+      const menu = modelRef.current?.querySelector('.composer-model-menu');
+      const box = modelRef.current?.getBoundingClientRect();
+      if (!menu || !box) return;
+      const view = window.visualViewport;
+      const viewTop = view?.offsetTop ?? 0;
+      const viewHeight = view?.height ?? window.innerHeight;
+      const room = Math.floor(box.top - viewTop - 12);
+      const cap = Math.floor(viewHeight * 0.8);
+      menu.style.maxHeight = `${Math.max(120, Math.min(room, cap))}px`;
+    }
+    function onPointer(e) {
+      if (!modelRef.current?.contains(e.target)) setModelOpen(false);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') setModelOpen(false);
+    }
+    fit();
+    document.addEventListener('pointerdown', onPointer);
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('resize', fit);
+    window.visualViewport?.addEventListener('resize', fit);
+    window.visualViewport?.addEventListener('scroll', fit);
+    return () => {
+      document.removeEventListener('pointerdown', onPointer);
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', fit);
+      window.visualViewport?.removeEventListener('resize', fit);
+      window.visualViewport?.removeEventListener('scroll', fit);
+    };
+  }, [modelOpen]);
 
   const typed = value.trim() !== '';
   const hasContent = typed || (!running && ready.length > 0);
@@ -214,7 +257,10 @@ export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, run
               aria-controls="composer-add-menu"
               aria-label={t('composer.add')}
               title={running ? t('composer.attachLater') : t('composer.add')}
-              onClick={() => setAddOpen((open) => !open)}
+              onClick={() => {
+                setModelOpen(false);
+                setAddOpen((open) => !open);
+              }}
             >
               <i class="bi bi-plus-lg" aria-hidden="true"></i>
             </button>
@@ -244,6 +290,7 @@ export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, run
             disabled={running && !canSteer}
             onInput={(e) => {
               setAddOpen(false);
+              setModelOpen(false);
               onChange(e.currentTarget.value);
             }}
             onKeyDown={onKeyDown}
@@ -253,6 +300,65 @@ export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, run
             <button type="button" class="composer-round composer-ghost" onClick={voice.cancel} title={t('composer.recordCancel')} aria-label={t('composer.recordCancel')}>
               <i class="bi bi-x-lg" aria-hidden="true"></i>
             </button>
+          )}
+          {choices.length > 0 && (
+            <div class="dropup" ref={modelRef}>
+              <button
+                type="button"
+                class="composer-round composer-ghost"
+                disabled={running}
+                aria-expanded={modelOpen}
+                aria-haspopup="menu"
+                aria-controls="composer-model-menu"
+                aria-label={t('composer.model')}
+                title={t('composer.model')}
+                onClick={() => {
+                  setAddOpen(false);
+                  setModelOpen((open) => !open);
+                }}
+              >
+                <svg class="composer-brain" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M14.99 7.05c.06-.14.11-.29.15-.44a3.486 3.486 0 0 0-2.17-4.13c-.08-.86-.56-1.66-1.36-2.12a2.726 2.726 0 0 0-3.62.84C7.51.48 6.68 0 5.74 0a2.72 2.72 0 0 0-2.71 2.47c-.75.28-1.38.8-1.8 1.5-.47.8-.6 1.74-.37 2.64.04.15.08.3.14.44C.37 7.7-.01 8.57-.01 9.51s.37 1.8 1.02 2.46c.15.15.32.29.5.41v.13c0 .96.39 1.84 1.03 2.46C3.16 15.61 4.04 16 5 16s1.81-.36 2.46-1.02c.22-.22.4-.45.56-.72.23.39.53.73.88 1.01.62.48 1.36.72 2.12.72.15 0 .3 0 .46-.03.92-.11 1.74-.58 2.31-1.33.5-.65.75-1.44.72-2.26.91-.62 1.52-1.68 1.52-2.87 0-.93-.38-1.81-1.01-2.46Zm-8.2 7.26a2.547 2.547 0 0 1-4.32-1.47q.495.15 1.02.15c.26 0 .47-.22.47-.47s-.21-.47-.47-.47c-.45 0-.88-.11-1.26-.34-.2-.1-.38-.24-.54-.4-.48-.48-.74-1.12-.74-1.8 0-.78.37-1.52.97-2 .09-.07.2-.14.3-.2.23-.13.3-.42.17-.64a.46.46 0 0 0-.57-.21c0-.03-.02-.06-.03-.08-.17-.66-.08-1.35.27-1.93.25-.43.62-.77 1.06-.99.06.23.15.44.26.64.08.15.24.24.4.24.08 0 .16-.02.24-.07.23-.13.3-.41.18-.64-.14-.24-.23-.52-.24-.79v-.1c0-.99.8-1.79 1.79-1.79s1.79.8 1.79 1.79v3.01c0 1.18-.79 2.23-1.92 2.56-.24.07-.4.33-.32.58.08.24.34.39.58.32.65-.2 1.22-.56 1.66-1.04v4.36c0 .68-.26 1.31-.74 1.79Zm7.01-2.61s-.05.03-.07.05c-.36.19-.77.3-1.21.3a.47.47 0 1 0 0 .94c.35 0 .69-.06 1.01-.15-.05.44-.22.87-.5 1.22a2.534 2.534 0 0 1-3.56.46c-.53-.42-.88-1.02-.97-1.68 0-.1-.02-.22-.02-.32V8.16c.43.48 1.01.85 1.66 1.04.05 0 .08.02.13.02.21 0 .4-.13.45-.34a.456.456 0 0 0-.32-.58 2.68 2.68 0 0 1-1.92-2.56V2.73c0-.32.08-.63.24-.89.49-.86 1.58-1.15 2.44-.66s1.15 1.59.66 2.45c-.13.23-.06.51.17.64s.51.06.64-.17c.11-.21.21-.42.26-.64.44.22.82.56 1.07.99.34.58.44 1.27.27 1.93 0 .03-.02.06-.03.08-.22-.08-.46 0-.58.21-.13.22-.06.51.17.64.1.06.21.13.3.2.6.48.97 1.21.97 2 0 .93-.51 1.75-1.26 2.19"/>
+                </svg>
+              </button>
+              <ul id="composer-model-menu" class={`dropdown-menu composer-model-menu ${modelOpen ? 'show' : ''}`} role="menu">
+                <li>
+                  <button
+                    type="button"
+                    class={`dropdown-item ${model === '' ? 'active' : ''}`}
+                    role="menuitemradio"
+                    aria-checked={model === ''}
+                    title={t('composer.modelDefault', { model: models?.current?.model || '?' })}
+                    onClick={() => {
+                      onModelChange('');
+                      setModelOpen(false);
+                    }}
+                  >
+                    {t('composer.modelDefault', { model: models?.current?.model || '?' })}
+                  </button>
+                </li>
+                {choices.map((c) => {
+                  const label = models.providers.length > 1 ? `${c.provider} · ${c.model}` : c.model;
+                  return (
+                    <li key={c.value}>
+                      <button
+                        type="button"
+                        class={`dropdown-item ${model === c.value ? 'active' : ''}`}
+                        role="menuitemradio"
+                        aria-checked={model === c.value}
+                        title={label}
+                        onClick={() => {
+                          onModelChange(c.value);
+                          setModelOpen(false);
+                        }}
+                      >
+                        {label}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           )}
           {running && (
             <button type="button" class="composer-round btn btn-outline-danger" onClick={onStop} title={t('composer.stop')} aria-label={t('composer.stop')}>
@@ -289,26 +395,7 @@ export function Composer({ value, onChange, onSubmit, onVoice, onStop, busy, run
           )}
         </div>
       </div>
-      <div class="d-flex align-items-center gap-2 mt-1">
-        {choices.length > 0 && (
-          <select
-            class="form-select form-select-sm w-auto model-select"
-            value={model}
-            disabled={running}
-            onChange={(e) => onModelChange(e.currentTarget.value)}
-            title={t('composer.model')}
-            aria-label={t('composer.model')}
-          >
-            <option value="">{t('composer.modelDefault', { model: models?.current?.model || '?' })}</option>
-            {choices.map((c) => (
-              <option key={c.value} value={c.value}>
-                {models.providers.length > 1 ? `${c.provider} · ${c.model}` : c.model}
-              </option>
-            ))}
-          </select>
-        )}
-        <div class={`form-text m-0 text-truncate ${(voice.notice && !voice.recording && !sendingVoice) || (failed && !running) ? 'text-danger' : ''} ${items.length || voice.recording || voice.notice || sendingVoice ? '' : 'd-none d-md-block'}`}>{hint}</div>
-      </div>
+      <div class={`form-text mt-1 text-truncate ${(voice.notice && !voice.recording && !sendingVoice) || (failed && !running) ? 'text-danger' : ''} ${items.length || voice.recording || voice.notice || sendingVoice ? '' : 'd-none d-md-block'}`}>{hint}</div>
     </div>
   );
 }

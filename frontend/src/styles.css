@@ -355,6 +355,13 @@ body,
   transform: translate(-1px, 1px);
 }
 
+.composer-brain {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+  fill: currentColor;
+}
+
 .composer-add-menu {
   top: auto;
   bottom: calc(100% + 0.35rem);
@@ -362,9 +369,21 @@ body,
   min-width: 12rem;
 }
 
-.model-select {
-  max-width: 260px;
-  flex-shrink: 0;
+.composer-model-menu {
+  top: auto;
+  bottom: calc(100% + 0.35rem);
+  right: 0;
+  left: auto;
+  min-width: 12rem;
+  max-width: min(18rem, 70vw);
+  max-height: min(80dvh, 80vh);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.composer-model-menu .dropdown-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* composer attachments */
