@@ -4,6 +4,8 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-16
+
 - Markdown files in the Work view render as HTML. Other source files stay plain text.
 - PDFs in the Work view open in the page. The download link stays.
 - Outside the app: nginx's `/_work_pdf/` location must allow this site to frame the file (`X-Frame-Options: SAMEORIGIN` and `frame-ancestors 'self'`). Other responses stay `DENY`. A release deploy does not rewrite nginx snippets. An existing install has to update that snippet and reload nginx. The next `provision.sh --work-root` writes the same snippet.
