@@ -59,10 +59,16 @@ if [ ! -f "$APP_ROOT/config/config.php" ]; then
   KEY="$(grep -m1 '^API_SERVER_KEY=' "$ENV_FILE" | cut -d= -f2- | tr -d "\r\"' ")"
   PORT="$(grep -m1 '^API_SERVER_PORT=' "$ENV_FILE" | cut -d= -f2- | tr -d "\r\"' ")"
   [ -n "$KEY" ] || fail "API_SERVER_KEY not set in $ENV_FILE"
+  KOCO_WORK=""
+  if [ -s /etc/kocoui/work-root ]; then
+    KOCO_WORK="$(head -n 1 /etc/kocoui/work-root | tr -d '\r')"
+    [[ "$KOCO_WORK" =~ ^/[a-z0-9/_.-]+$ && "$KOCO_WORK" != *..* ]] || KOCO_WORK=""
+  fi
   (
     umask 077
     KOCO_KEY="$KEY" KOCO_SECRET="$(openssl rand -hex 32)" KOCO_URL="https://$DOMAIN" \
     KOCO_PORT="${PORT:-8642}" KOCO_NAME="$APP_NAME" KOCO_LANG="$DEFAULT_LANG" \
+    KOCO_WORK="$KOCO_WORK" \
     php -r '
       require $argv[3];
       $c = require $argv[1];
@@ -72,6 +78,10 @@ if [ ! -f "$APP_ROOT/config/config.php" ]; then
       $c["hermes"]["base_url"] = "http://127.0.0.1:" . getenv("KOCO_PORT");
       $c["hermes"]["api_key"] = getenv("KOCO_KEY");
       $c["security"]["secret"] = getenv("KOCO_SECRET");
+      $work = getenv("KOCO_WORK") ?: "";
+      if ($work !== "") {
+        $c["files"]["work_root"] = $work;
+      }
       $vapid = KocoUI\Push\Vapid::generate();
       $c["push"]["vapid_subject"] = "mailto:admin@" . parse_url(getenv("KOCO_URL"), PHP_URL_HOST);
       $c["push"]["vapid_public"] = $vapid["public"];

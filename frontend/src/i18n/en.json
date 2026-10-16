@@ -62,6 +62,7 @@
   "nav.tools": "Tools & skills",
   "nav.jobs": "Jobs",
   "nav.persona": "Persona",
+  "nav.work": "Work",
 
   "persona.title": "Persona",
   "persona.intro": "This is who the agent is. It is sent with every conversation, including ones that are already open. The previous text is kept until you save again.",
@@ -74,6 +75,20 @@
   "persona.error.tooLong": "That is longer than the agent will keep. Shorten it before saving.",
   "persona.error.invalid": "The persona text is not valid.",
   "persona.error.noPrevious": "There is no previous persona to restore.",
+
+  "work.title": "Work",
+  "work.root": "Work",
+  "work.intro": "Files and folders the agent writes in its work directory. This view only reads them.",
+  "work.empty": "Nothing here yet. The agent has not added files to this folder.",
+  "work.refresh": "Refresh",
+  "work.truncated": "This folder has more entries than the list shows.",
+  "work.previewTruncated": "The preview shows the start of the file.",
+  "work.previewEmpty": "Select a file to preview it.",
+  "work.download": "Download",
+  "work.open": "Open",
+  "work.link": "Link, not opened",
+  "work.error.unavailable": "The work directory is not set up on the server.",
+  "work.error.notText": "This file cannot be previewed as text.",
 
   "tools.title": "Tools & skills",
   "tools.intro": "What the agent can use on this server. Read-only; changes are made in the agent's configuration.",

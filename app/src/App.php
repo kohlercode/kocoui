@@ -10,6 +10,7 @@ use KocoUI\Controllers\FilesController;
 use KocoUI\Controllers\GatewayController;
 use KocoUI\Controllers\PersonaController;
 use KocoUI\Controllers\PushController;
+use KocoUI\Controllers\WorkController;
 use KocoUI\Http\Csrf;
 use KocoUI\Http\HttpError;
 use KocoUI\Http\Request;
@@ -87,6 +88,10 @@ final class App
         $r->add('POST', '/api/files/meta', [FilesController::class, 'meta']);
         $r->add('GET', '/api/files', [FilesController::class, 'serve']);
         $r->add('GET', '/api/files/thumb', [FilesController::class, 'thumb']);
+        $r->add('GET', '/api/work', [WorkController::class, 'listing']);
+        $r->add('GET', '/api/work/file', [WorkController::class, 'file']);
+        $r->add('GET', '/api/work/text', [WorkController::class, 'text']);
+        $r->add('GET', '/api/work/thumb', [WorkController::class, 'thumb']);
         $r->add('GET', '/api/sessions', [ChatController::class, 'sessions']);
         $r->add('GET', '/api/sessions/{id}/messages', [ChatController::class, 'messages']);
         $r->add('PATCH', '/api/sessions/{id}', [ChatController::class, 'rename']);

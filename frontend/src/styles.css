@@ -1020,3 +1020,28 @@ body,
   background: var(--bs-tertiary-bg);
   border: 1px solid var(--bs-border-color-translucent);
 }
+
+.work-layout {
+  min-height: 0;
+}
+
+.work-list,
+.work-preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+@media (min-width: 768px) {
+  .work-list {
+    flex: 0 0 22rem;
+    max-width: 28rem;
+  }
+}
+
+.work-pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 70vh;
+  overflow: auto;
+}

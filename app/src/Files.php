@@ -155,4 +155,57 @@ final class Files
         }
         return ($i === 0 ? (string) $bytes : number_format($n, $n < 10 ? 1 : 0)) . ' ' . $units[$i];
     }
+
+    /**
+     * Writes a cached thumbnail or redirects to the original. $accelPrefix is the
+     * internal nginx location (`/_files/` or `/_work/`) and $relative is the path under it.
+     */
+    public static function sendThumbnail(string $real, int $width, string $accelPrefix, string $relative): never
+    {
+        if (!in_array($width, self::THUMB_WIDTHS, true)) {
+            $width = 480;
+        }
+        $mime = self::mime($real);
+        $key = sha1($real . '|' . filemtime($real) . '|' . filesize($real) . '|' . $width);
+        $cacheDir = APP_ROOT . '/var/cache/thumbs/' . substr($key, 0, 2);
+        $webp = function_exists('imagewebp');
+        $cache = $cacheDir . '/' . $key . ($webp ? '.webp' : '.jpg');
+
+        if (!is_file($cache)) {
+            $dim = @getimagesize($real);
+            // Small images and huge ones (decoding would blow the memory limit) are served as they are.
+            if (!$dim || $dim[0] <= $width || $dim[0] * $dim[1] > 40_000_000) {
+                self::accelInline($mime, $accelPrefix, $relative);
+            }
+            $src = @imagecreatefromstring((string) file_get_contents($real));
+            if ($src === false) {
+                self::accelInline($mime, $accelPrefix, $relative);
+            }
+            $height = max(1, (int) round($dim[1] * $width / $dim[0]));
+            $dst = imagecreatetruecolor($width, $height);
+            imagealphablending($dst, false);
+            imagesavealpha($dst, true);
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $width, $height, $dim[0], $dim[1]);
+            if (!is_dir($cacheDir)) {
+                mkdir($cacheDir, 0700, true);
+            }
+            $tmp = $cache . '.' . bin2hex(random_bytes(4));
+            $webp ? imagewebp($dst, $tmp, 82) : imagejpeg($dst, $tmp, 82);
+            rename($tmp, $cache);
+        }
+        header('Content-Type: ' . ($webp ? 'image/webp' : 'image/jpeg'));
+        header('Cache-Control: private, max-age=86400');
+        header('Content-Length: ' . filesize($cache));
+        readfile($cache);
+        exit;
+    }
+
+    private static function accelInline(string $mime, string $accelPrefix, string $relative): never
+    {
+        header_remove('Cache-Control');
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline');
+        header('X-Accel-Redirect: ' . $accelPrefix . implode('/', array_map('rawurlencode', explode('/', $relative))));
+        exit;
+    }
 }

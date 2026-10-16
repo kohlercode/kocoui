@@ -38,7 +38,9 @@ If a steer message lands after the final answer, Hermes returns it as `pending_s
 
 ## The agent sent a file and the UI cannot read it
 
-The agent runs with `umask 077`. Copying a file into the outbox can leave the ACL mask as `---`, so the PHP user cannot read it even though a default ACL exists. `provision.sh` installs a small root inotify service (`kocoui-files-acl`) that resets the mask. `audit.sh` checks that the service is active.
+The agent runs with `umask 077`. Copying a file into the outbox, or into the work directory, can leave the ACL mask as `---`, so the PHP user cannot read it even though a default ACL exists. `provision.sh` installs a small root inotify service (`kocoui-files-acl`) that resets the mask on the outbox and, when you passed `--work-root`, on that directory too. `audit.sh` checks that the service is active.
+
+A file the Work view cannot open usually means that watcher is down, or `provision.sh` was re-run without `--work-root` after the directory was set. `files.work_root` in `config.php`, the nginx alias, and `open_basedir` have to be the same path.
 
 `test -r` is misleading here. Check with a real read as the app user.
 

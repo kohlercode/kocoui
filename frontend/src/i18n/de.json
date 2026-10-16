@@ -62,6 +62,7 @@
   "nav.tools": "Tools & Skills",
   "nav.jobs": "Jobs",
   "nav.persona": "Persönlichkeit",
+  "nav.work": "Arbeit",
 
   "persona.title": "Persönlichkeit",
   "persona.intro": "Das ist, wer der Agent ist. Der Text geht mit jeder Unterhaltung mit, auch mit solchen, die schon offen sind. Die vorherige Fassung bleibt erhalten, bis du erneut speicherst.",
@@ -74,6 +75,20 @@
   "persona.error.tooLong": "Das ist länger, als der Agent behält. Kürze den Text vor dem Speichern.",
   "persona.error.invalid": "Der Text der Persönlichkeit ist ungültig.",
   "persona.error.noPrevious": "Es gibt keine vorherige Fassung.",
+
+  "work.title": "Arbeitsordner",
+  "work.root": "Arbeit",
+  "work.intro": "Dateien und Ordner, die der Agent in seinem Arbeitsverzeichnis anlegt. Diese Ansicht liest sie nur.",
+  "work.empty": "Hier liegt noch nichts. Der Agent hat in diesem Ordner noch keine Dateien angelegt.",
+  "work.refresh": "Aktualisieren",
+  "work.truncated": "Dieser Ordner enthält mehr Einträge, als die Liste zeigt.",
+  "work.previewTruncated": "Die Vorschau zeigt den Anfang der Datei.",
+  "work.previewEmpty": "Wähle eine Datei aus, um sie anzusehen.",
+  "work.download": "Herunterladen",
+  "work.open": "Öffnen",
+  "work.link": "Verknüpfung, wird nicht geöffnet",
+  "work.error.unavailable": "Das Arbeitsverzeichnis ist auf dem Server nicht eingerichtet.",
+  "work.error.notText": "Diese Datei lässt sich nicht als Text anzeigen.",
 
   "tools.title": "Werkzeuge & Skills",
   "tools.intro": "Was der Agent auf diesem Server nutzen kann. Nur Anzeige; Änderungen erfolgen in der Konfiguration des Agenten.",

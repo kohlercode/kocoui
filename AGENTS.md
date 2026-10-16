@@ -13,7 +13,7 @@ A self-hosted PHP web interface for an existing Hermes Agent on the same machine
 - Do not add `--yolo`, `approvals.mode: off`, or `approvals.mode: smart`. "Always allow" in the UI is Hermes' `always` choice.
 - Do not add a terminal, PTY, or shell endpoint. The FPM pool disables PHP's exec-family functions. Gateway restart writes a stamp file; it does not call `exec`.
 - Passwords are argon2id. TOTP is mandatory. There is no self-registration.
-- Every file path from the browser or an agent reply goes through `Files::resolve()`.
+- Every chat file path from the browser or an agent reply goes through `Files::resolve()` and stays inside the shared files root. The Work view reads a second directory, `files.work_root`, set by the operator. The agent and the browser do not choose that path, and the app does not write there.
 - Persona edits `SOUL.md` only, in place, with one previous copy under `app/var/soul`.
 - Web Push payloads are status lines and links, not prompts or commands.
 - User-facing strings belong in `frontend/src/i18n/en.json`, `de.json`, and `es.json`. German uses "du". Spanish uses "tú".

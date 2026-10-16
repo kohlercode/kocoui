@@ -62,6 +62,7 @@
   "nav.tools": "Herramientas y habilidades",
   "nav.jobs": "Tareas",
   "nav.persona": "Persona",
+  "nav.work": "Trabajo",
 
   "persona.title": "Persona",
   "persona.intro": "Esto es quién es el agente. Se envía con cada conversación, también con las que ya están abiertas. El texto anterior se conserva hasta que vuelvas a guardar.",
@@ -74,6 +75,20 @@
   "persona.error.tooLong": "Es más largo de lo que el agente conservará. Acórtalo antes de guardar.",
   "persona.error.invalid": "El texto de la persona no es válido.",
   "persona.error.noPrevious": "No hay una persona anterior que restaurar.",
+
+  "work.title": "Carpeta de trabajo",
+  "work.root": "Trabajo",
+  "work.intro": "Archivos y carpetas que el agente crea en su directorio de trabajo. Esta vista solo los lee.",
+  "work.empty": "Aquí no hay nada todavía. El agente aún no ha añadido archivos a esta carpeta.",
+  "work.refresh": "Actualizar",
+  "work.truncated": "Esta carpeta tiene más entradas de las que muestra la lista.",
+  "work.previewTruncated": "La vista previa muestra el inicio del archivo.",
+  "work.previewEmpty": "Elige un archivo para verlo.",
+  "work.download": "Descargar",
+  "work.open": "Abrir",
+  "work.link": "Enlace, no se abre",
+  "work.error.unavailable": "El directorio de trabajo no está configurado en el servidor.",
+  "work.error.notText": "Este archivo no se puede ver como texto.",
 
   "tools.title": "Herramientas y habilidades",
   "tools.intro": "Lo que el agente puede usar en este servidor. Solo lectura; los cambios se hacen en la configuración del agente.",

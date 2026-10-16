@@ -1,5 +1,5 @@
 {
-  "kocoui": { "version": "0.6.1" },
+  "kocoui": { "version": "0.7.0" },
   "features": { "jobs_admin": true },
-  "files": { "max_upload_bytes": 52428800, "max_per_message": 10 }
+  "files": { "max_upload_bytes": 52428800, "max_per_message": 10, "work": true }
 }

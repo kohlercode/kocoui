@@ -1,0 +1,14 @@
+{
+  "dirs": {
+    "": [
+      { "name": "notes", "type": "dir" },
+      { "name": "shore.png", "type": "file", "size": 3175, "mime": "image/png", "kind": "image", "file": "media/shore.png" },
+      { "name": "notes.pdf", "type": "file", "size": 591, "mime": "application/pdf", "kind": "pdf", "file": "media/notes.pdf" },
+      { "name": "readme.md", "type": "file", "size": 92, "mime": "text/markdown", "kind": "file", "text": true, "body": "# Notes\n\nA sample the agent left in its work folder.\n" },
+      { "name": "outside", "type": "link" }
+    ],
+    "notes": [
+      { "name": "today.md", "type": "file", "size": 42, "mime": "text/plain", "kind": "file", "text": true, "body": "Today the agent wrote this note.\n" }
+    ]
+  }
+}

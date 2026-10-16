@@ -13,6 +13,7 @@ use KocoUI\Push\WatchQueue;
 use KocoUI\Session;
 use KocoUI\Version;
 use KocoUI\Uploads;
+use KocoUI\Work;
 use KocoUI\Http\HttpError;
 use KocoUI\Http\Request;
 use KocoUI\Http\Response;
@@ -33,6 +34,7 @@ final class ChatController
             'files' => [
                 'max_upload_bytes' => FilesController::maxBytes(),
                 'max_per_message' => (int) Config::get('files.max_per_message', 10),
+                'work' => Work::enabled(),
             ],
         ]);
     }

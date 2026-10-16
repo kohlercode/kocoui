@@ -10,6 +10,7 @@ import { ChatView } from './ChatView.jsx';
 import { ToolsView } from './ToolsView.jsx';
 import { JobsView } from './JobsView.jsx';
 import { PersonaView } from './PersonaView.jsx';
+import { WorkView } from './WorkView.jsx';
 import { disablePush, enablePush, pushPrefOn, pushSupported } from '../push.js';
 import { play, setSoundsEnabled, soundsEnabled } from '../sounds.js';
 
@@ -22,6 +23,7 @@ function viewFromHash() {
   if (location.hash === '#/tools') return 'tools';
   if (location.hash === '#/jobs') return 'jobs';
   if (location.hash === '#/persona') return 'persona';
+  if (location.hash === '#/work') return 'work';
   return 'chat';
 }
 
@@ -205,6 +207,12 @@ export function Layout({ user, onLoggedOut }) {
               <i class="bi bi-chat-left-text" aria-hidden="true"></i>
               <span class="d-none d-lg-inline ms-1">{t('nav.chat')}</span>
             </button>
+            {limits?.work && (
+              <button class={`btn ${view === 'work' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('work')} title={t('nav.work')}>
+                <i class="bi bi-folder" aria-hidden="true"></i>
+                <span class="d-none d-lg-inline ms-1">{t('nav.work')}</span>
+              </button>
+            )}
             <button class={`btn ${view === 'tools' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('tools')} title={t('nav.tools')}>
               <i class="bi bi-tools" aria-hidden="true"></i>
               <span class="d-none d-lg-inline ms-1">{t('nav.tools')}</span>
@@ -338,6 +346,7 @@ export function Layout({ user, onLoggedOut }) {
           {view === 'tools' && <ToolsView />}
           {view === 'jobs' && (features.jobs_admin ? <JobsView /> : <div class="p-4 text-body-secondary">{t('jobs.disabled')}</div>)}
           {view === 'persona' && <PersonaView />}
+          {view === 'work' && <WorkView />}
         </main>
       </div>
     </div>

@@ -7,6 +7,7 @@ import skills from './fixtures/skills.json';
 import jobs from './fixtures/jobs.json';
 import persona from './fixtures/persona.json';
 import files from './fixtures/files.json';
+import work from './fixtures/work.json';
 import approval from './fixtures/approval.json';
 import { rejectDemo } from './note.js';
 
@@ -93,7 +94,40 @@ function approvalState() {
   };
 }
 
-function get(url) {
+function workListing(rel) {
+  const rows = work.dirs[rel];
+  if (!rows) return null;
+  const base = import.meta.env.BASE_URL;
+  return {
+    path: rel,
+    truncated: false,
+    entries: rows.map((row) => {
+      const path = rel ? `${rel}/${row.name}` : row.name;
+      const entry = { name: row.name, type: row.type, path, modified: now() };
+      if (row.type !== 'file') return entry;
+      return {
+        ...entry,
+        size: row.size,
+        mime: row.mime,
+        kind: row.kind,
+        text: !!row.text,
+        url: row.file ? `${base}${row.file}` : undefined,
+      };
+    }),
+  };
+}
+
+function workText(rel) {
+  for (const [dir, rows] of Object.entries(work.dirs)) {
+    for (const row of rows) {
+      const path = dir ? `${dir}/${row.name}` : row.name;
+      if (path === rel && row.text) return { text: row.body || '', truncated: false };
+    }
+  }
+  return null;
+}
+
+function get(url, query = '') {
   if (url === '/api/auth/me') {
     return { authenticated: true, user: { username: 'alice' }, csrf: csrfToken };
   }
@@ -106,6 +140,18 @@ function get(url) {
     return { data };
   }
   if (url === '/api/capabilities') return capabilities;
+  if (url === '/api/work') {
+    const rel = new URLSearchParams(query).get('path') || '';
+    const page = workListing(rel);
+    if (!page) throw new ApiError(404, 'not_found', 'Folder not found');
+    return page;
+  }
+  if (url === '/api/work/text') {
+    const rel = new URLSearchParams(query).get('path') || '';
+    const body = workText(rel);
+    if (!body) throw new ApiError(415, 'not_text', 'This file cannot be previewed as text');
+    return body;
+  }
   if (url === '/api/models') return models;
   if (url === '/api/toolsets') return toolsets;
   if (url === '/api/skills') return skills;
@@ -120,11 +166,13 @@ function get(url) {
 }
 
 export async function api(method, path, body) {
-  const url = path.split('?')[0];
+  const q = path.indexOf('?');
+  const url = q === -1 ? path : path.slice(0, q);
+  const query = q === -1 ? '' : path.slice(q + 1);
   if (method === 'POST' && url === '/api/files/meta') {
     const paths = Array.isArray(body?.paths) ? body.paths : [];
     return { data: paths.map((p) => fileInfo(String(p))) };
   }
   if (method !== 'GET' || url === '/api/push') rejectDemo();
-  return get(url);
+  return get(url, query);
 }

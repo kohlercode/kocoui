@@ -122,8 +122,27 @@ if [ -n "$FILES_ROOT" ]; then
   check "push watch dry-run exits cleanly" "$(runuser -u "$APP_USER" -- php "$APP_ROOT/bin/kocoui" push:watch --dry-run >/dev/null 2>&1; echo $?)" "0"
   check "no web request holds a worker for minutes" "$(grep -c 'fastcgi_finish_request' "$APP_ROOT/src/Push/RunWatcher.php")" "0"
   SOUL="/home/$HERMES_USER/.hermes/SOUL.md"
-  check "PHP open_basedir limited to app, files and the persona file" "$(awk -F' *= *' '$1 == "php_admin_value[open_basedir]" {print $2}' /etc/php/*/fpm/pool.d/"$APP_USER".conf)" "$APP_ROOT:$FILES_ROOT:$SOUL"
+  WORK_ROOT=$(runuser -u "$APP_USER" -- env APP_ROOT="$APP_ROOT" php -r 'define("APP_ROOT", getenv("APP_ROOT")); require APP_ROOT . "/src/autoload.php";
+    KocoUI\Config::load(APP_ROOT . "/config/config.php"); echo (string) KocoUI\Config::get("files.work_root", "");' 2>/dev/null || true)
+  BASEDIR="$APP_ROOT:$FILES_ROOT:$SOUL"
+  [ -n "$WORK_ROOT" ] && BASEDIR="$BASEDIR:$WORK_ROOT"
+  check "PHP open_basedir limited to app, files, persona, and the work directory when set" "$(awk -F' *= *' '$1 == "php_admin_value[open_basedir]" {print $2}' /etc/php/*/fpm/pool.d/"$APP_USER".conf)" "$BASEDIR"
   check "app can read the persona file" "$(runuser -u "$APP_USER" -- head -c 1 "$SOUL" >/dev/null 2>&1 && echo yes)" "yes"
+  if [ -n "$WORK_ROOT" ]; then
+    case "$WORK_ROOT" in
+      "/home/$HERMES_USER"|"/home/$HERMES_USER/.hermes"|"/home/$HERMES_USER/.hermes/"*) work_outside=no ;;
+      *) work_outside=yes ;;
+    esac
+    check "work root is outside the Hermes config directory" "$work_outside" "yes"
+    check "nginx work alias matches the work root" "$(grep -F -c "alias ${WORK_ROOT}/;" /etc/nginx/snippets/hermesweb-work.conf 2>/dev/null || true)" "2"
+    check "app can read the work directory" "$(runuser -u "$APP_USER" -- test -r "$WORK_ROOT" -a -x "$WORK_ROOT" && echo yes || echo no)" "yes"
+    check "app cannot write the work directory" "$(tries "$APP_USER" "$WORK_ROOT")" "no"
+    SAMPLE=$(find "$WORK_ROOT" -xdev -type f -print -quit 2>/dev/null || true)
+    if [ -n "$SAMPLE" ]; then
+      check "app can read a file in the work directory" "$(runuser -u "$APP_USER" -- head -c 1 "$SAMPLE" >/dev/null 2>&1 && echo yes || echo no)" "yes"
+    fi
+    check "internal /_work/ location not reachable" "$("${AUTHWEB[@]}" -o /dev/null -w '%{http_code}' "https://$DOMAIN/_work/")" "404"
+  fi
   check "app cannot read the Hermes env file" "$(runuser -u "$APP_USER" -- head -c 1 "/home/$HERMES_USER/.hermes/.env" >/dev/null 2>&1 && echo yes || echo no)" "no"
   check "gateway restart path unit enabled" "$(systemctl is-enabled kocoui-restart-gateway.path 2>/dev/null || echo no)" "enabled"
   check "gateway restart helper is root-only" "$(stat -c '%a %U' /usr/local/sbin/kocoui-restart-gateway 2>/dev/null)" "700 root"

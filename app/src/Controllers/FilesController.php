@@ -118,54 +118,10 @@ final class FilesController
     {
         $real = Files::resolve((string) ($req->query['path'] ?? '')) ?? throw new HttpError(404, 'not_found', 'File not found');
         $width = (int) ($req->query['w'] ?? 480);
-        if (!in_array($width, Files::THUMB_WIDTHS, true)) {
-            $width = 480;
-        }
-        $mime = Files::mime($real);
-        if (!Files::thumbable($mime)) {
+        if (!Files::thumbable(Files::mime($real))) {
             throw new HttpError(415, 'no_thumbnail', 'No thumbnail for this file type');
         }
-        $key = sha1($real . '|' . filemtime($real) . '|' . filesize($real) . '|' . $width);
-        $cacheDir = APP_ROOT . '/var/cache/thumbs/' . substr($key, 0, 2);
-        $webp = function_exists('imagewebp');
-        $cache = $cacheDir . '/' . $key . ($webp ? '.webp' : '.jpg');
-
-        if (!is_file($cache)) {
-            $dim = @getimagesize($real);
-            // Small images and huge ones (decoding would blow the memory limit) are served as they are.
-            if (!$dim || $dim[0] <= $width || $dim[0] * $dim[1] > 40_000_000) {
-                self::redirectToOriginal($real, $mime);
-            }
-            $src = @imagecreatefromstring((string) file_get_contents($real));
-            if ($src === false) {
-                self::redirectToOriginal($real, $mime);
-            }
-            $height = max(1, (int) round($dim[1] * $width / $dim[0]));
-            $dst = imagecreatetruecolor($width, $height);
-            imagealphablending($dst, false);
-            imagesavealpha($dst, true);
-            imagecopyresampled($dst, $src, 0, 0, 0, 0, $width, $height, $dim[0], $dim[1]);
-            if (!is_dir($cacheDir)) {
-                mkdir($cacheDir, 0700, true);
-            }
-            $tmp = $cache . '.' . bin2hex(random_bytes(4));
-            $webp ? imagewebp($dst, $tmp, 82) : imagejpeg($dst, $tmp, 82);
-            rename($tmp, $cache);
-        }
-        header('Content-Type: ' . ($webp ? 'image/webp' : 'image/jpeg'));
-        header('Cache-Control: private, max-age=86400');
-        header('Content-Length: ' . filesize($cache));
-        readfile($cache);
-        exit;
-    }
-
-    private static function redirectToOriginal(string $real, string $mime): never
-    {
-        header_remove('Cache-Control');
-        header('Content-Type: ' . $mime);
-        header('Content-Disposition: inline');
-        header('X-Accel-Redirect: /_files/' . implode('/', array_map('rawurlencode', explode('/', Files::relative($real)))));
-        exit;
+        Files::sendThumbnail($real, $width, '/_files/', Files::relative($real));
     }
 
     public static function maxBytes(): int

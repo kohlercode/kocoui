@@ -5,6 +5,7 @@
 # Usage (as root, from the deploy/ directory):
 #   ./provision.sh --domain ui.example.com [--app-user hermesweb] [--hermes-user hermes] [--basic-auth-user NAME]
 #                  [--files-root /srv/kocoui/files] [--upload-max-mb 50] [--files-retention-days 30]
+#                  [--work-root /home/hermes/work]
 #
 # Prerequisites: Hermes installed and its gateway running on 127.0.0.1 (see
 # docs/install.md), and a DNS A/AAAA record for --domain that
@@ -16,6 +17,7 @@ APP_USER="hermesweb"
 HERMES_USER="hermes"
 BA_USER=""
 FILES_ROOT="/srv/kocoui/files"
+WORK_ROOT=""
 UPLOAD_MAX=50
 FILES_RETENTION=30
 
@@ -26,6 +28,7 @@ while [ $# -gt 0 ]; do
     --hermes-user)     HERMES_USER="$2"; shift 2 ;;
     --basic-auth-user) BA_USER="$2"; shift 2 ;;
     --files-root)      FILES_ROOT="${2%/}"; shift 2 ;;
+    --work-root)       WORK_ROOT="${2%/}"; shift 2 ;;
     --upload-max-mb)   UPLOAD_MAX="$2"; shift 2 ;;
     --files-retention-days) FILES_RETENTION="$2"; shift 2 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
@@ -37,6 +40,14 @@ done
 [[ "$APP_USER" =~ ^[a-z_][a-z0-9_-]*$ ]] || { echo "invalid --app-user" >&2; exit 2; }
 [[ "$HERMES_USER" =~ ^[a-z_][a-z0-9_-]*$ ]] || { echo "invalid --hermes-user" >&2; exit 2; }
 [[ "$FILES_ROOT" =~ ^/[a-z0-9/_.-]+$ && "$FILES_ROOT" != *..* ]] || { echo "invalid --files-root" >&2; exit 2; }
+if [ -n "$WORK_ROOT" ]; then
+  [[ "$WORK_ROOT" =~ ^/[a-z0-9/_.-]+$ && "$WORK_ROOT" != *..* ]] || { echo "invalid --work-root" >&2; exit 2; }
+  case "$WORK_ROOT" in
+    "/home/$HERMES_USER"|"/home/$HERMES_USER/.hermes"|"/home/$HERMES_USER/.hermes/"*)
+      echo "--work-root must not be the agent home or inside ~/.hermes" >&2
+      exit 2 ;;
+  esac
+fi
 SOUL_PATH="/home/$HERMES_USER/.hermes/SOUL.md"
 [[ "$UPLOAD_MAX" =~ ^[0-9]{1,4}$ && "$FILES_RETENTION" =~ ^[0-9]{1,4}$ ]] || { echo "invalid size or retention" >&2; exit 2; }
 BA_USER="${BA_USER:-$APP_USER}"
@@ -44,6 +55,8 @@ BA_USER="${BA_USER:-$APP_USER}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 T="$HERE/templates"
 APP_ROOT="/home/$APP_USER/app"
+OPEN_BASEDIR="$APP_ROOT:$FILES_ROOT:$SOUL_PATH"
+[ -n "$WORK_ROOT" ] && OPEN_BASEDIR="$OPEN_BASEDIR:$WORK_ROOT"
 HTPASSWD_DIR="/etc/nginx/hermesweb"
 HTPASSWD="$HTPASSWD_DIR/$DOMAIN.htpasswd"
 BA_SECRET_FILE="/root/basic-auth-$DOMAIN.txt"
@@ -54,6 +67,7 @@ render() {
   sed -e "s|__DOMAIN__|$DOMAIN|g" -e "s|__APP_USER__|$APP_USER|g" -e "s|__APP_ROOT__|$APP_ROOT|g" \
       -e "s|__FILES_ROOT__|$FILES_ROOT|g" -e "s|__UPLOAD_MAX__|$UPLOAD_MAX|g" \
       -e "s|__FILES_RETENTION__|$FILES_RETENTION|g" -e "s|__SOUL_PATH__|$SOUL_PATH|g" \
+      -e "s|__WORK_ROOT__|$WORK_ROOT|g" -e "s|__OPEN_BASEDIR__|$OPEN_BASEDIR|g" \
       "$1" | tr -d '\r' > "$2"
 }
 
@@ -88,6 +102,43 @@ install -d -o "$APP_USER" -g "$APP_USER" -m 750 "$FILES_ROOT/inbox"
 install -d -o "$HERMES_USER" -g "$HERMES_USER" -m 750 "$FILES_ROOT/outbox"
 setfacl -m "u:$HERMES_USER:rX" -m "d:u:$HERMES_USER:rX" -m "d:g:$APP_USER:rX" -m "d:u::rwX" "$FILES_ROOT/inbox"
 setfacl -R -P -m "g:$APP_USER:rX,m::rX" -m "d:g:$APP_USER:rX,d:m::rX" "$FILES_ROOT/outbox"
+
+# Work directory: the agent writes, the app and nginx only read. Group ACL
+# matches the outbox so www-data (in the app group) can serve the files.
+# Traverse on parents is execute-only, with no default ACL, so a new file
+# elsewhere in the agent home does not become readable.
+install -d -m 755 /etc/kocoui
+if [ -n "$WORK_ROOT" ]; then
+  install -d -o "$HERMES_USER" -g "$HERMES_USER" -m 750 "$WORK_ROOT"
+  parent="$(dirname "$WORK_ROOT")"
+  while [ "$parent" != "/" ]; do
+    runuser -u "$APP_USER" -- test -x "$parent" 2>/dev/null || setfacl -m "u:$APP_USER:x" "$parent"
+    runuser -u www-data -- test -x "$parent" 2>/dev/null || setfacl -m "u:www-data:x" "$parent"
+    parent="$(dirname "$parent")"
+  done
+  setfacl -R -P -m "g:$APP_USER:rX,m::rX" -m "d:g:$APP_USER:rX,d:m::rX" "$WORK_ROOT"
+  printf '%s\n' "$WORK_ROOT" > /etc/kocoui/work-root
+  if [ -f "$APP_ROOT/config/config.php" ]; then
+    ( umask 077; WORK_ROOT="$WORK_ROOT" php -r '
+      $file = $argv[1];
+      $c = require $file;
+      if (!is_array($c)) { fwrite(STDERR, "config.php did not return an array\n"); exit(1); }
+      if (!isset($c["files"]) || !is_array($c["files"])) $c["files"] = [];
+      $c["files"]["work_root"] = getenv("WORK_ROOT");
+      $tmp = $file . ".tmp";
+      file_put_contents($tmp, "<?php\n// updated by provision.sh (work root)\nreturn " . var_export($c, true) . ";\n");
+      chmod($tmp, 0600);
+      rename($tmp, $file);
+    ' "$APP_ROOT/config/config.php" )
+    chown "$APP_USER:$APP_USER" "$APP_ROOT/config/config.php"
+    echo "files.work_root set in config.php"
+  fi
+else
+  : > /etc/kocoui/work-root
+  echo "off (pass --work-root to enable the work viewer)"
+fi
+chmod 644 /etc/kocoui/work-root
+
 render "$T/kocoui-files-acl.sh" /usr/local/sbin/kocoui-files-acl
 render "$T/kocoui-files-prune.sh" /usr/local/sbin/kocoui-files-prune
 render "$T/kocoui-push-watch.sh" /usr/local/sbin/kocoui-push-watch
@@ -145,6 +196,13 @@ render "$T/nginx-http-context.conf" /etc/nginx/conf.d/hermesweb.conf
 render "$T/nginx-headers-base.conf" /etc/nginx/snippets/hermesweb-headers-base.conf
 render "$T/nginx-headers.conf" /etc/nginx/snippets/hermesweb-headers.conf
 render "$T/nginx-php.conf" /etc/nginx/snippets/hermesweb-php.conf
+if [ -n "$WORK_ROOT" ]; then
+  render "$T/nginx-work.conf" /etc/nginx/snippets/hermesweb-work.conf
+else
+  printf '%s\n' '# Work folder viewer is off. Re-run provision.sh with --work-root to enable it.' \
+    > /etc/nginx/snippets/hermesweb-work.conf
+fi
+chmod 644 /etc/nginx/snippets/hermesweb-work.conf
 
 log "basic auth"
 if [ ! -s "$HTPASSWD" ]; then

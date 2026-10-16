@@ -22,8 +22,13 @@ return [
 
     // Shared folder for uploads (inbox/) and files the agent sends (outbox/), created by
     // deploy/provision.sh. max_upload_mb must not exceed provision's --upload-max-mb (nginx limit).
+    // work_root is the agent's project tree, shown read-only in the Work view. Leave it
+    // empty to hide that view. Set it with provision.sh --work-root, and do not point it
+    // at the Hermes home or ~/.hermes. The value must match the path provision wrote
+    // into nginx and open_basedir.
     'files' => [
         'root' => '/srv/kocoui/files',
+        'work_root' => '',
         'max_upload_mb' => 50,
         'max_per_message' => 10,
     ],

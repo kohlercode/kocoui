@@ -35,6 +35,8 @@ export function errorText(t, e) {
     too_many_files: 'files.error.tooMany',
     empty_file: 'files.error.empty',
     files_unavailable: 'files.error.unavailable',
+    work_unavailable: 'work.error.unavailable',
+    not_text: 'work.error.notText',
     persona_unavailable: 'persona.error.unavailable',
     persona_too_long: 'persona.error.tooLong',
     persona_invalid: 'persona.error.invalid',

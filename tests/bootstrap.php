@@ -8,7 +8,7 @@ if (!defined('APP_ROOT')) {
 
 require dirname(__DIR__) . '/app/src/autoload.php';
 
-foreach (['var/data', 'var/cache', 'var/run', 'var/sessions', 'var/log', 'config', 'files/inbox', 'files/outbox'] as $dir) {
+foreach (['var/data', 'var/cache', 'var/run', 'var/sessions', 'var/log', 'config', 'files/inbox', 'files/outbox', 'work'] as $dir) {
     $path = APP_ROOT . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $dir);
     if (!is_dir($path) && !mkdir($path, 0700, true) && !is_dir($path)) {
         fwrite(STDERR, "cannot create $path\n");
@@ -33,6 +33,7 @@ $GLOBALS['kocoui_config_base'] = [
     ],
     'files' => [
         'root' => $filesRoot,
+        'work_root' => APP_ROOT . DIRECTORY_SEPARATOR . 'work',
         'max_upload_mb' => 50,
         'max_per_message' => 10,
     ],

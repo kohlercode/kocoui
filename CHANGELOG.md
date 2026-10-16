@@ -4,6 +4,12 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-16
+
+- A Work view lists one directory the agent writes. It is read-only, and it stays hidden until `files.work_root` is set with `provision.sh --work-root`.
+- Images, audio, video, and PDF open in the view. Source files preview as text. HTML and SVG download.
+- Pass `--work-root` again whenever you re-run provision. Leaving it out turns the viewer off in nginx and PHP. Do not point the directory at `~/.hermes`.
+
 ## [0.6.1] - 2026-10-11
 
 - A public demo of the interface is linked from the README. It uses example conversations. Actions that would change data open a note.

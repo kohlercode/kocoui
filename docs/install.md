@@ -37,11 +37,23 @@ On the VPS as root, from a copy of this repo's `deploy/` directory:
 ./provision.sh --domain ui.example.com
 ```
 
-Useful flags: `--app-user hermesweb`, `--hermes-user hermes`, `--files-root /srv/kocoui/files`, `--upload-max-mb 50`, `--basic-auth-user NAME`.
+Useful flags: `--app-user hermesweb`, `--hermes-user hermes`, `--files-root /srv/kocoui/files`, `--upload-max-mb 50`, `--basic-auth-user NAME`, `--work-root /home/hermes/work`.
 
 The script is safe to run again. It installs nginx, PHP-FPM (curl, mbstring, sqlite3, gd, and `ext-sodium` when the distro package does not already include it), certbot, fail2ban, and ufw rules for ports 22, 80, and 443. Login needs `ext-sodium`. It creates the app user, a PHP pool that cannot call `exec`, the shared `inbox/` and `outbox/` folders, a TLS certificate, and HTTP basic auth. The basic-auth password is written to `/root/basic-auth-<domain>.txt` (mode 600).
 
 It also sets Hermes `platform_hints.api_server.replace` so replies use GitHub-flavored Markdown, which this UI renders. That writes a Hermes config key.
+
+### Work directory
+
+The Work view lists one directory the agent already uses for its project files. It is off until you set that path. The app can read the directory and cannot write it. Chat uploads still go to `inbox/`, and files the agent attaches to a message still go to `outbox/`. Do not point the work directory at the agent home or at `~/.hermes`.
+
+```bash
+./provision.sh --domain ui.example.com --work-root /home/hermes/work
+```
+
+Pass `--work-root` again whenever you re-run `provision.sh`. Leaving it out turns the viewer off in nginx and PHP. The path is stored in `/etc/kocoui/work-root`. The first install copies it into `config.php` as `files.work_root`. If `config.php` already exists, provision updates that one value. Later deploys do not change `config.php`.
+
+`files.work_root` has to match the path provision wrote into nginx and `open_basedir`. Changing the directory means running provision again with the new `--work-root`. `deploy/audit.sh` checks that the three copies match, that the app can read the directory, and that it cannot create a file there.
 
 ## 3. Deploy the app
 
