@@ -3,9 +3,14 @@ import { api } from '../api.js';
 import { useI18n } from '../i18n/index.js';
 import { fileIcon, humanSize } from '../uploads.js';
 import { errorText } from '../util.js';
+import { Markdown } from './Message.jsx';
 
 function downloadUrl(url) {
   return `${url}${url.includes('?') ? '&' : '?'}download=1`;
+}
+
+function isMarkdown(name) {
+  return /\.(md|markdown)$/i.test(name || '');
 }
 
 export function WorkView() {
@@ -171,7 +176,9 @@ export function WorkView() {
               {selected.text && !previewLoading && !previewError && (
                 <>
                   {previewTruncated && <div class="small text-body-secondary mb-2">{t('work.previewTruncated')}</div>}
-                  <pre class="work-pre border rounded p-3 mb-0">{preview}</pre>
+                  {isMarkdown(selected.name)
+                    ? <Markdown text={preview} />
+                    : <pre class="work-pre border rounded p-3 mb-0">{preview}</pre>}
                 </>
               )}
               {!selected.text && selected.kind === 'image' && selected.url && (
@@ -184,7 +191,7 @@ export function WorkView() {
                 <video class="w-100" src={selected.url} controls playsInline></video>
               )}
               {!selected.text && selected.kind === 'pdf' && selected.url && (
-                <a href={selected.url} target="_blank" rel="noopener">{t('work.open')}</a>
+                <iframe class="work-pdf" src={selected.url} title={selected.name}></iframe>
               )}
             </>
           )}

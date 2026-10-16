@@ -4,6 +4,10 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+- Markdown files in the Work view render as HTML. Other source files stay plain text.
+- PDFs in the Work view open in the page. The download link stays.
+- Outside the app: nginx's `/_work_pdf/` location must allow this site to frame the file (`X-Frame-Options: SAMEORIGIN` and `frame-ancestors 'self'`). Other responses stay `DENY`. A release deploy does not rewrite nginx snippets. An existing install has to update that snippet and reload nginx. The next `provision.sh --work-root` writes the same snippet.
+
 ## [0.7.0] - 2026-10-16
 
 - A Work view lists one directory the agent writes. It is read-only, and it stays hidden until `files.work_root` is set with `provision.sh --work-root`.

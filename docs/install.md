@@ -55,6 +55,8 @@ Pass `--work-root` again whenever you re-run `provision.sh`. Leaving it out turn
 
 `files.work_root` has to match the path provision wrote into nginx and `open_basedir`. Changing the directory means running provision again with the new `--work-root`. `deploy/audit.sh` checks that the three copies match, that the app can read the directory, and that it cannot create a file there.
 
+PDFs from that directory open inside the page. The nginx location that serves them allows framing by this site only (`X-Frame-Options: SAMEORIGIN`). Every other response stays `DENY`. A release deploy does not rewrite that snippet.
+
 ## 3. Deploy the app
 
 On your computer, in this repo (Node.js 20.19+ or 22.12+):
