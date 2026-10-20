@@ -1054,3 +1054,29 @@ body,
   border-radius: 0.375rem;
   background: var(--bs-body-bg);
 }
+
+/* Idle / absolute session warning (SessionWarning.jsx) */
+.session-warn-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.session-warn-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1081;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.session-warn-card {
+  pointer-events: auto;
+  width: min(100%, 26rem);
+  padding: 1.25rem 1.35rem;
+  border-radius: 0.75rem;
+}

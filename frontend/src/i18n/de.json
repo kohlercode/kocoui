@@ -24,6 +24,13 @@
   "login.error.input": "Bitte alle Felder ausfüllen; der Code hat 6 Ziffern.",
 
   "nav.logout": "Abmelden",
+
+  "session.warn.title": "Noch da?",
+  "session.warn.body": "Deine Sitzung endet in {time} wegen Inaktivität. Bleib angemeldet, oder melde dich jetzt ab.",
+  "session.warn.absoluteTitle": "Sitzung endet",
+  "session.warn.absoluteBody": "Deine Sitzung erreicht in {time} ihr Zeitlimit. Du musst dich danach neu anmelden.",
+  "session.warn.stay": "Angemeldet bleiben",
+  "session.warn.logout": "Abmelden",
   "nav.version": "App-Version {version}",
   "nav.settings": "Einstellungen",
   "nav.theme.dark": "Dunkles Design",

@@ -24,6 +24,13 @@
   "login.error.input": "Please fill in all fields; the code has 6 digits.",
 
   "nav.logout": "Sign out",
+
+  "session.warn.title": "Still there?",
+  "session.warn.body": "Your session will end in {time} because of inactivity. Stay signed in, or sign out now.",
+  "session.warn.absoluteTitle": "Session ending",
+  "session.warn.absoluteBody": "Your session reaches its time limit in {time}. You will need to sign in again.",
+  "session.warn.stay": "Stay signed in",
+  "session.warn.logout": "Sign out",
   "nav.version": "App version {version}",
   "nav.settings": "Settings",
   "nav.theme.dark": "Dark mode",

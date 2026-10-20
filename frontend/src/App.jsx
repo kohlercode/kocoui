@@ -63,7 +63,7 @@ export function App() {
   } else if (!state.me.authenticated) {
     body = <Login onSuccess={refresh} />;
   } else {
-    body = <Layout user={state.me.user} onLoggedOut={refresh} />;
+    body = <Layout user={state.me.user} session={state.me.session || null} onLoggedOut={refresh} />;
   }
 
   return <I18n.Provider value={i18n}>{body}</I18n.Provider>;

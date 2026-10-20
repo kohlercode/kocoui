@@ -111,6 +111,16 @@ runuser -u hermesweb -- php /home/hermesweb/app/bin/kocoui push:vapid
 
 Paste the printed values into `config.php` under `push`, then reload PHP-FPM.
 
+## Optional: session timeouts
+
+`config.php` under `security` controls how long a signed-in browser stays usable:
+
+- `session_idle` — seconds without a request before the session is cleared (default `7200`)
+- `session_absolute` — hard cap from login (default `43200`)
+- `session_idle_warn` — seconds before expiry when the UI asks to stay signed in or sign out (default `120`; set `0` to disable the modal)
+
+Existing installs that omit `session_idle_warn` get `120` from the code default. Changing these values does not require a re-provision; reload PHP-FPM after editing `config.php`. See [security-model.md](security-model.md#session-lifetime).
+
 ## Updates
 
 ```bash

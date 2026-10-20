@@ -13,6 +13,7 @@ import { PersonaView } from './PersonaView.jsx';
 import { WorkView } from './WorkView.jsx';
 import { disablePush, enablePush, pushPrefOn, pushSupported } from '../push.js';
 import { play, setSoundsEnabled, soundsEnabled } from '../sounds.js';
+import { SessionWarning } from './SessionWarning.jsx';
 
 function sessionFromHash() {
   const m = location.hash.match(/^#\/s\/(.+)$/);
@@ -27,7 +28,7 @@ function viewFromHash() {
   return 'chat';
 }
 
-export function Layout({ user, onLoggedOut }) {
+export function Layout({ user, session = null, onLoggedOut }) {
   const { t } = useI18n();
   const [theme, setThemeState] = useState(getTheme);
   const [sessions, setSessions] = useState([]);
@@ -149,14 +150,14 @@ export function Layout({ user, onLoggedOut }) {
     };
   }, [settingsOpen]);
 
-  async function logout() {
+  const logout = useCallback(async () => {
     try {
       const res = await api('POST', '/api/auth/logout');
       setCsrf(res.csrf);
     } finally {
       onLoggedOut();
     }
-  }
+  }, [onLoggedOut]);
 
   async function togglePush() {
     if (pushBusy) return;
@@ -315,6 +316,7 @@ export function Layout({ user, onLoggedOut }) {
         </div>
       </nav>
       <ThemePanel open={themeOpen} mode={theme} onMode={chooseMode} onClose={() => setThemeOpen(false)} />
+      <SessionWarning session={session} onLogout={logout} />
       <div class="d-flex flex-grow-1 min-h-0 position-relative">
         <aside class={`sidebar border-end bg-body ${sidebarOpen ? 'open' : ''}`}>
           <SessionList

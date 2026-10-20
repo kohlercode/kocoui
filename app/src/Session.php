@@ -90,4 +90,37 @@ final class Session
     {
         return isset($_SESSION['uid']) ? (int) $_SESSION['uid'] : null;
     }
+
+    /**
+     * Idle/absolute limits for the browser idle-warning modal.
+     * Returns null when logged out. warn=0 means the UI should not warn (operator disabled it).
+     *
+     * Do not poll an authenticated endpoint only to read these values: Session::start()
+     * refreshes last_seen on every request, so that poll would defeat the idle timeout.
+     * The UI counts down client-side and calls /api/auth/me once for "Stay logged in".
+     *
+     * @return array{idle:int,absolute:int,warn:int,login_at:int}|null
+     */
+    public static function clientTiming(): ?array
+    {
+        if (self::userId() === null) {
+            return null;
+        }
+        $idle = max(1, (int) Config::get('security.session_idle', 7200));
+        $absolute = max(1, (int) Config::get('security.session_absolute', 43200));
+        $warn = (int) Config::get('security.session_idle_warn', 120);
+        if ($warn < 0) {
+            $warn = 0;
+        }
+        // Keep the warning window strictly shorter than idle when enabled.
+        if ($warn > 0 && $warn >= $idle) {
+            $warn = max(1, intdiv($idle, 10));
+        }
+        return [
+            'idle' => $idle,
+            'absolute' => $absolute,
+            'warn' => $warn,
+            'login_at' => (int) ($_SESSION['login_at'] ?? time()),
+        ];
+    }
 }

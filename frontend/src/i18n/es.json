@@ -24,6 +24,13 @@
   "login.error.input": "Rellena todos los campos; el código tiene 6 dígitos.",
 
   "nav.logout": "Cerrar sesión",
+
+  "session.warn.title": "¿Sigues ahí?",
+  "session.warn.body": "Tu sesión terminará en {time} por inactividad. Quédate conectado o cierra la sesión ahora.",
+  "session.warn.absoluteTitle": "La sesión termina",
+  "session.warn.absoluteBody": "Tu sesión alcanza su límite de tiempo en {time}. Tendrás que iniciar sesión de nuevo.",
+  "session.warn.stay": "Seguir conectado",
+  "session.warn.logout": "Cerrar sesión",
   "nav.version": "Versión de la app {version}",
   "nav.settings": "Ajustes",
   "nav.theme.dark": "Modo oscuro",

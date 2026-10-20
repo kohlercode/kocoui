@@ -18,11 +18,16 @@ final class AuthController
     public static function me(Request $req): never
     {
         $user = self::currentUser();
-        Response::json([
+        $payload = [
             'authenticated' => $user !== null,
             'user' => $user ? ['username' => $user['username']] : null,
             'csrf' => Session::csrf(),
-        ]);
+        ];
+        $timing = Session::clientTiming();
+        if ($timing !== null) {
+            $payload['session'] = $timing;
+        }
+        Response::json($payload);
     }
 
     public static function login(Request $req): never

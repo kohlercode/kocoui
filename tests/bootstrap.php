@@ -41,6 +41,7 @@ $GLOBALS['kocoui_config_base'] = [
         'secret' => bin2hex(random_bytes(32)),
         'session_idle' => 7200,
         'session_absolute' => 43200,
+        'session_idle_warn' => 120,
         'login_max_attempts' => 5,
         'login_window' => 900,
     ],

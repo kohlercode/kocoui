@@ -4,6 +4,11 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-19
+
+- Shortly before a session ends from inactivity (or the absolute login cap), the UI shows a modal to stay signed in or sign out.
+- `security.session_idle_warn` in `config.php` sets the lead time in seconds (default 120). Set it to `0` to turn the modal off. Documented in the security model, install guide, and troubleshooting notes.
+
 ## [0.8.0] - 2026-10-16
 
 - Markdown files in the Work view render as HTML. Other source files stay plain text.

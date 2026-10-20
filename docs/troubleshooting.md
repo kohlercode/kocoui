@@ -75,3 +75,7 @@ The composer records with the browser microphone and uploads the clip as an audi
 ## Gateway restart from the UI does nothing
 
 Restart is a stamp file under `app/var/run`. A root systemd path unit (`kocoui-restart-gateway.path`) notices it and restarts `hermes-gateway`. The PHP user never gets `exec` or sudo. `audit.sh` checks that the unit is enabled.
+
+## Idle warning modal never appears, or appears while you are working
+
+The modal is driven by a client timer using `security.session_idle` / `session_absolute` / `session_idle_warn` from `GET /api/auth/me`. Successful API calls reset that timer (they also refresh server `last_seen`). A tab that only shows a finished chat with no further requests will warn near the idle limit. Set `session_idle_warn` to `0` in `config.php` to disable the modal. Absolute expiry cannot be extended with “Stay signed in”.

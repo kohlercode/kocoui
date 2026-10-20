@@ -36,8 +36,13 @@ return [
     'security' => [
         // 64 hex chars (openssl rand -hex 32). Encrypts TOTP secrets at rest.
         'secret' => '',
+        // Seconds without a request before the session is cleared (default 2 h).
         'session_idle' => 7200,
+        // Hard cap from login, even with activity (default 12 h).
         'session_absolute' => 43200,
+        // Seconds before idle/absolute expiry when the UI shows a stay-or-logout modal.
+        // 0 disables the modal. Existing config.php files without this key get 120.
+        'session_idle_warn' => 120,
         'login_max_attempts' => 5,
         'login_window' => 900,
     ],

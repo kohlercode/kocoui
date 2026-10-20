@@ -1,3 +1,5 @@
+import { bumpActivity } from './sessionActivity.js';
+
 let csrfToken = '';
 const unauthorizedListeners = new Set();
 
@@ -52,5 +54,7 @@ export async function api(method, path, body, extraHeaders = {}) {
     }
     throw new ApiError(res.status, err.code || 'http_' + res.status, err.message || res.statusText, err);
   }
+  // Successful calls refresh server last_seen; keep the client idle clock in sync.
+  bumpActivity({ force: true });
   return data;
 }

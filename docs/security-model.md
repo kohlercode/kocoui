@@ -28,6 +28,18 @@ There is no terminal or PTY endpoint in the web app. There is no self-registrati
 
 A stolen session cookie can do what that user can do in the UI until the session ends. It cannot mint a new user, read `config.php`, or open the Hermes port from the internet. `deploy/provision.sh` also puts HTTP basic auth in front of the whole site.
 
+## Session lifetime
+
+PHP sessions use the `__Host-hwsid` cookie (Secure, HttpOnly, SameSite=Strict). Two limits apply, both set in `config.php` under `security`:
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `session_idle` | 7200 (2 h) | Cleared after this many seconds with no request that opens the session |
+| `session_absolute` | 43200 (12 h) | Cleared this many seconds after login, even with activity |
+| `session_idle_warn` | 120 | Seconds before the nearer of those deadlines when the UI shows a stay-or-logout modal. `0` turns the modal off |
+
+Every authenticated request refreshes the idle clock (`last_seen`). The warning modal therefore does **not** poll the server to measure remaining time: that would keep the session alive. The browser counts down from local activity (and successful API calls), and “Stay signed in” calls `GET /api/auth/me` once. Absolute expiry cannot be extended; near that limit the modal only offers sign-out.
+
 ## How this differs from an in-process UI
 
 An in-process web UI loads the agent in the same program as the website and reads the Hermes home directly. A bug in that website is a bug in the agent process: the API key, the config, and the tool runtime are already there. Some of those UIs also expose a terminal in the browser and leave the password optional.
