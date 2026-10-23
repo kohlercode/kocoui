@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { api, setCsrf } from '../api.js';
 import { useI18n } from '../i18n/index.js';
 import { getTheme, setTheme } from '../theme.js';
@@ -14,6 +14,34 @@ import { WorkView } from './WorkView.jsx';
 import { disablePush, enablePush, pushPrefOn, pushSupported } from '../push.js';
 import { play, setSoundsEnabled, soundsEnabled } from '../sounds.js';
 import { SessionWarning } from './SessionWarning.jsx';
+
+const SIDEBAR_WIDTH_KEY = 'kocoui.sidebarWidth';
+const SIDEBAR_DEFAULT = 290;
+const SIDEBAR_MIN = 200;
+const SIDEBAR_MAX = 480;
+const SIDEBAR_GUTTER = 48;
+
+function sidebarMaxWidth() {
+  return Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, window.innerWidth - SIDEBAR_GUTTER));
+}
+
+function clampSidebarWidth(n) {
+  return Math.round(Math.min(sidebarMaxWidth(), Math.max(SIDEBAR_MIN, n)));
+}
+
+function loadSidebarWidth() {
+  const n = Number(localStorage.getItem(SIDEBAR_WIDTH_KEY));
+  const raw = Number.isFinite(n) ? n : SIDEBAR_DEFAULT;
+  return Math.round(Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, raw)));
+}
+
+function storeSidebarWidth(n) {
+  try {
+    localStorage.setItem(SIDEBAR_WIDTH_KEY, String(n));
+  } catch {
+    /* private mode or quota */
+  }
+}
 
 function sessionFromHash() {
   const m = location.hash.match(/^#\/s\/(.+)$/);
@@ -38,6 +66,10 @@ export function Layout({ user, session = null, onLoggedOut }) {
   const [view, setView] = useState(viewFromHash);
   const [viewKey, setViewKey] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarPreferred = useRef(loadSidebarWidth());
+  const [sidebarWidth, setSidebarWidth] = useState(() => clampSidebarWidth(sidebarPreferred.current));
+  const [sidebarResizing, setSidebarResizing] = useState(false);
+  const sidebarRef = useRef(null);
   const [themeOpen, setThemeOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [pushOn, setPushOn] = useState(pushPrefOn);
@@ -149,6 +181,58 @@ export function Layout({ user, session = null, onLoggedOut }) {
       document.removeEventListener('keydown', onKey);
     };
   }, [settingsOpen]);
+
+  useLayoutEffect(() => {
+    if (sidebarRef.current) sidebarRef.current.style.width = `${sidebarWidth}px`;
+  }, [sidebarWidth]);
+
+  useEffect(() => {
+    function onResize() {
+      setSidebarWidth(clampSidebarWidth(sidebarPreferred.current));
+    }
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  function onSidebarResizeStart(e) {
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const handle = e.currentTarget;
+    try {
+      handle.setPointerCapture(e.pointerId);
+    } catch {
+      /* Pointer capture is unavailable for this event. */
+    }
+    const startX = e.clientX;
+    const startW = sidebarRef.current?.getBoundingClientRect().width || sidebarWidth;
+    setSidebarResizing(true);
+    function move(ev) {
+      setSidebarWidth(clampSidebarWidth(startW + (ev.clientX - startX)));
+    }
+    function end(ev) {
+      handle.removeEventListener('pointermove', move);
+      handle.removeEventListener('pointerup', end);
+      handle.removeEventListener('pointercancel', end);
+      const next = clampSidebarWidth(startW + (ev.clientX - startX));
+      sidebarPreferred.current = next;
+      setSidebarWidth(next);
+      storeSidebarWidth(next);
+      setSidebarResizing(false);
+    }
+    handle.addEventListener('pointermove', move);
+    handle.addEventListener('pointerup', end);
+    handle.addEventListener('pointercancel', end);
+  }
+
+  function onSidebarResizeKey(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const next = clampSidebarWidth(sidebarWidth + (e.key === 'ArrowRight' ? 16 : -16));
+    sidebarPreferred.current = next;
+    setSidebarWidth(next);
+    storeSidebarWidth(next);
+  }
 
   const logout = useCallback(async () => {
     try {
@@ -318,7 +402,7 @@ export function Layout({ user, session = null, onLoggedOut }) {
       <ThemePanel open={themeOpen} mode={theme} onMode={chooseMode} onClose={() => setThemeOpen(false)} />
       <SessionWarning session={session} onLogout={logout} />
       <div class="d-flex flex-grow-1 min-h-0 position-relative">
-        <aside class={`sidebar border-end bg-body ${sidebarOpen ? 'open' : ''}`}>
+        <aside ref={sidebarRef} class={`sidebar border-end bg-body ${sidebarOpen ? 'open' : ''} ${sidebarResizing ? 'is-resizing' : ''}`}>
           <SessionList
             sessions={sessions}
             loading={sessionsLoading}
@@ -330,6 +414,18 @@ export function Layout({ user, session = null, onLoggedOut }) {
             onDelete={remove}
             onReload={loadSessions}
           />
+          <div
+            class="sidebar-resizer"
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={t('nav.sidebarResize')}
+            aria-valuemin={SIDEBAR_MIN}
+            aria-valuemax={sidebarMaxWidth()}
+            aria-valuenow={sidebarWidth}
+            onPointerDown={onSidebarResizeStart}
+            onKeyDown={onSidebarResizeKey}
+            tabIndex={0}
+          ></div>
         </aside>
         {sidebarOpen && <div class="sidebar-backdrop d-md-none" onClick={() => setSidebarOpen(false)}></div>}
         <main class="flex-grow-1 min-w-0">

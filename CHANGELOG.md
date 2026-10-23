@@ -4,6 +4,12 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-22
+
+- A copy button under each finished agent reply copies that reply as Markdown text. Hovering the button shows a tooltip.
+- Chats can be pinned to the top of the sidebar. Pins stay in this browser.
+- The sidebar width can be dragged from the phone drawer up through the desktop column. The width is remembered in this browser.
+
 ## [0.9.0] - 2026-10-19
 
 - Shortly before a session ends from inactivity (or the absolute login cap), the UI shows a modal to stay signed in or sign out.

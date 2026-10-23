@@ -24,6 +24,7 @@
   "login.error.input": "Rellena todos los campos; el código tiene 6 dígitos.",
 
   "nav.logout": "Cerrar sesión",
+  "nav.sidebarResize": "Cambiar el ancho de la barra",
 
   "session.warn.title": "¿Sigues ahí?",
   "session.warn.body": "Tu sesión terminará en {time} por inactividad. Quédate conectado o cierra la sesión ahora.",
@@ -120,6 +121,9 @@
   "sessions.new": "Nueva conversación",
   "sessions.reload": "Recargar",
   "sessions.empty": "Aún no hay conversaciones.",
+  "sessions.pinned": "Fijados",
+  "sessions.pin": "Fijar",
+  "sessions.unpin": "Quitar fijado",
   "sessions.mine": "Mis chats",
   "sessions.agent": "Chats del agente",
   "sessions.sectionEmpty": "Aún no hay.",
@@ -130,6 +134,8 @@
   "sessions.deleteConfirm": "¿Eliminar la conversación «{title}»? Se borra del historial del agente.",
 
   "chat.empty": "Empieza una conversación con el agente.",
+  "chat.copy": "Copiar",
+  "chat.copied": "Copiado",
   "chat.toolResult": "Resultado de {tool}",
   "chat.status.working": "El agente está trabajando…",
   "chat.status.approval": "Esperando tu aprobación",

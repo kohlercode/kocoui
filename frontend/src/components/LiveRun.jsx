@@ -4,6 +4,7 @@ import { Markdown } from './Message.jsx';
 import { ApprovalCard } from './ApprovalCard.jsx';
 import { extractFiles } from '../media.js';
 import { play } from '../sounds.js';
+import { CopyReply } from './CopyReply.jsx';
 
 export function LiveRun({ run, onApprove }) {
   const { t } = useI18n();
@@ -11,6 +12,12 @@ export function LiveRun({ run, onApprove }) {
   const waiting = !run.text && run.tools.length === 0 && !run.approval;
   // The files appear with the final transcript; while streaming only the tags are hidden.
   const text = extractFiles('assistant', run.text || '').text;
+  const stillGoing =
+    waiting ||
+    run.status === 'running' ||
+    run.status === 'queued' ||
+    run.status === 'stopping' ||
+    run.status === 'waiting_for_approval';
   const approvalKey = run.approval
     ? String(run.approval.request_id || run.approval.command || 'pending')
     : '';
@@ -53,9 +60,12 @@ export function LiveRun({ run, onApprove }) {
       {run.approval && <ApprovalCard approval={run.approval} onChoose={onApprove} />}
 
       {text && (
-        <div class="bubble bubble-agent">
-          <Markdown text={text} />
-        </div>
+        <>
+          <div class="bubble bubble-agent">
+            <Markdown text={text} />
+          </div>
+          {!stillGoing && <CopyReply text={text} />}
+        </>
       )}
 
       <div class="small text-body-secondary mt-2 d-flex align-items-center gap-2">

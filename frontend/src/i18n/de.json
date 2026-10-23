@@ -24,6 +24,7 @@
   "login.error.input": "Bitte alle Felder ausfüllen; der Code hat 6 Ziffern.",
 
   "nav.logout": "Abmelden",
+  "nav.sidebarResize": "Seitenleiste in der Breite ändern",
 
   "session.warn.title": "Noch da?",
   "session.warn.body": "Deine Sitzung endet in {time} wegen Inaktivität. Bleib angemeldet, oder melde dich jetzt ab.",
@@ -120,6 +121,9 @@
   "sessions.new": "Neue Unterhaltung",
   "sessions.reload": "Neu laden",
   "sessions.empty": "Noch keine Unterhaltungen.",
+  "sessions.pinned": "Angeheftet",
+  "sessions.pin": "Anheften",
+  "sessions.unpin": "Loslösen",
   "sessions.mine": "Meine Chats",
   "sessions.agent": "Agent-Chats",
   "sessions.sectionEmpty": "Noch keine.",
@@ -130,6 +134,8 @@
   "sessions.deleteConfirm": "Unterhaltung „{title}“ löschen? Sie wird aus dem Verlauf des Agenten entfernt.",
 
   "chat.empty": "Starte eine Unterhaltung mit dem Agenten.",
+  "chat.copy": "Kopieren",
+  "chat.copied": "Kopiert",
   "chat.toolResult": "Ergebnis von {tool}",
   "chat.status.working": "Der Agent arbeitet …",
   "chat.status.approval": "Wartet auf deine Freigabe",

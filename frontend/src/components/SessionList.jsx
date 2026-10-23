@@ -3,6 +3,7 @@ import { useI18n } from '../i18n/index.js';
 import { relativeTime } from '../util.js';
 
 const STORAGE_KEY = 'kocoui.sessionSections';
+const PIN_KEY = 'kocoui.pinnedSessions';
 
 function isMine(session) {
   return !session.source || session.source === 'api_server';
@@ -11,10 +12,20 @@ function isMine(session) {
 function loadOpen() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || '');
-    if (!raw || typeof raw !== 'object') return { mine: true, agent: false };
-    return { mine: raw.mine !== false, agent: raw.agent === true };
+    if (!raw || typeof raw !== 'object') return { pinned: true, mine: true, agent: false };
+    return { pinned: raw.pinned !== false, mine: raw.mine !== false, agent: raw.agent === true };
   } catch {
-    return { mine: true, agent: false };
+    return { pinned: true, mine: true, agent: false };
+  }
+}
+
+function loadPins() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(PIN_KEY) || '');
+    if (!Array.isArray(raw)) return [];
+    return raw.filter((id) => typeof id === 'string' && id !== '');
+  } catch {
+    return [];
   }
 }
 
@@ -23,22 +34,30 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
   const [editing, setEditing] = useState(null);
   const [title, setTitle] = useState('');
   const [open, setOpen] = useState(loadOpen);
+  const [pins, setPins] = useState(loadPins);
   const expandedFor = useRef(null);
-  const mine = sessions.filter(isMine);
-  const agent = sessions.filter((s) => !isMine(s));
+  const pinnedSet = new Set(pins);
+  const byId = new Map(sessions.map((s) => [s.id, s]));
+  const pinned = pins.map((id) => byId.get(id)).filter(Boolean);
+  const mine = sessions.filter((s) => isMine(s) && !pinnedSet.has(s.id));
+  const agent = sessions.filter((s) => !isMine(s) && !pinnedSet.has(s.id));
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(open));
   }, [open]);
 
   useEffect(() => {
+    localStorage.setItem(PIN_KEY, JSON.stringify(pins));
+  }, [pins]);
+
+  useEffect(() => {
     if (!activeId || expandedFor.current === activeId) return;
     const session = sessions.find((s) => s.id === activeId);
     if (!session) return;
     expandedFor.current = activeId;
-    const key = isMine(session) ? 'mine' : 'agent';
+    const key = pinnedSet.has(session.id) ? 'pinned' : isMine(session) ? 'mine' : 'agent';
     setOpen((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
-  }, [activeId, sessions]);
+  }, [activeId, sessions, pins]);
 
   function toggle(key) {
     setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -59,7 +78,20 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
 
   function remove(s, e) {
     e.stopPropagation();
-    if (confirm(t('sessions.deleteConfirm', { title: s.title || s.preview || s.id }))) onDelete(s.id);
+    if (!confirm(t('sessions.deleteConfirm', { title: s.title || s.preview || s.id }))) return;
+    setPins((prev) => prev.filter((id) => id !== s.id));
+    onDelete(s.id);
+  }
+
+  function togglePin(s, e) {
+    e.stopPropagation();
+    const willPin = !pinnedSet.has(s.id);
+    setPins((prev) => (willPin ? [s.id, ...prev.filter((id) => id !== s.id)] : prev.filter((id) => id !== s.id)));
+    if (s.id === activeId) {
+      const key = willPin ? 'pinned' : isMine(s) ? 'mine' : 'agent';
+      setOpen((prev) => (prev[key] ? prev : { ...prev, [key]: true }));
+      expandedFor.current = activeId;
+    }
   }
 
   function row(s) {
@@ -89,10 +121,19 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
               <div class="text-truncate fw-medium">{s.title || s.preview || t('sessions.untitled')}</div>
               {s.id === activeId && (
                 <div class="d-flex gap-1 flex-shrink-0">
-                  <button class="btn btn-link btn-sm p-0 session-action" onClick={(e) => startEdit(s, e)} title={t('sessions.rename')}>
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm p-0 session-action"
+                    onClick={(e) => togglePin(s, e)}
+                    title={pinnedSet.has(s.id) ? t('sessions.unpin') : t('sessions.pin')}
+                    aria-label={pinnedSet.has(s.id) ? t('sessions.unpin') : t('sessions.pin')}
+                  >
+                    <i class={`bi ${pinnedSet.has(s.id) ? 'bi-pin-angle-fill' : 'bi-pin-angle'}`} aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-link btn-sm p-0 session-action" onClick={(e) => startEdit(s, e)} title={t('sessions.rename')}>
                     <i class="bi bi-pencil" aria-hidden="true"></i>
                   </button>
-                  <button class="btn btn-link btn-sm p-0 session-action" onClick={(e) => remove(s, e)} title={t('sessions.delete')}>
+                  <button type="button" class="btn btn-link btn-sm p-0 session-action" onClick={(e) => remove(s, e)} title={t('sessions.delete')}>
                     <i class="bi bi-trash" aria-hidden="true"></i>
                   </button>
                 </div>
@@ -150,6 +191,7 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
         {error && <div class="alert alert-warning m-2 py-2 small">{error}</div>}
         {loading && sessions.length === 0 && <div class="p-3 small text-body-secondary">{t('common.loading')}</div>}
         {none && <div class="p-3 small text-body-secondary">{t('sessions.empty')}</div>}
+        {!loading && pinned.length > 0 && section('pinned', t('sessions.pinned'), pinned)}
         {!loading && section('mine', t('sessions.mine'), mine)}
         {!loading && section('agent', t('sessions.agent'), agent)}
       </div>

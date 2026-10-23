@@ -48,8 +48,31 @@ body,
 
 /* sidebar */
 .sidebar {
+  position: relative;
   width: 290px;
   flex-shrink: 0;
+}
+
+.sidebar.is-resizing {
+  transition: none;
+  user-select: none;
+}
+
+.sidebar-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 6px;
+  z-index: 2;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.sidebar-resizer:hover,
+.sidebar-resizer:focus-visible,
+.sidebar.is-resizing .sidebar-resizer {
+  background: color-mix(in srgb, var(--k-primary) 45%, transparent);
 }
 
 .session-item {
@@ -121,6 +144,10 @@ body,
     transition: transform 0.2s ease;
   }
 
+  .sidebar.is-resizing {
+    transition: none;
+  }
+
   .sidebar.open {
     transform: none;
     box-shadow: var(--bs-box-shadow-lg);
@@ -157,6 +184,25 @@ body,
   background: var(--bs-tertiary-bg);
   border: 1px solid var(--bs-border-color-translucent);
   border-bottom-left-radius: 0.25rem;
+}
+
+button.copy-reply {
+  margin-top: 0.15rem;
+  padding: 0.05rem 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--bs-secondary-color);
+  line-height: 1;
+}
+
+button.copy-reply:hover,
+button.copy-reply:focus-visible {
+  color: var(--bs-body-color);
+  background: transparent;
+}
+
+button.copy-reply.copied {
+  color: var(--bs-success);
 }
 
 .md > :last-child {

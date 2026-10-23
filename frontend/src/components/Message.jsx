@@ -2,6 +2,7 @@ import { renderMarkdown } from '../markdown.js';
 import { useI18n } from '../i18n/index.js';
 import { extractFiles } from '../media.js';
 import { MediaGallery } from './MediaGallery.jsx';
+import { CopyReply } from './CopyReply.jsx';
 
 function toolCallNames(toolCalls) {
   let calls = toolCalls;
@@ -49,9 +50,12 @@ export function Message({ message }) {
     return (
       <div class="mb-3">
         {content.trim() && (
-          <div class="bubble bubble-agent">
-            <Markdown text={content} />
-          </div>
+          <>
+            <div class="bubble bubble-agent">
+              <Markdown text={content} />
+            </div>
+            <CopyReply text={content} />
+          </>
         )}
         {paths.length > 0 && <MediaGallery paths={paths} />}
         {tools.length > 0 && (

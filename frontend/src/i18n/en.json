@@ -24,6 +24,7 @@
   "login.error.input": "Please fill in all fields; the code has 6 digits.",
 
   "nav.logout": "Sign out",
+  "nav.sidebarResize": "Resize sidebar",
 
   "session.warn.title": "Still there?",
   "session.warn.body": "Your session will end in {time} because of inactivity. Stay signed in, or sign out now.",
@@ -120,6 +121,9 @@
   "sessions.new": "New conversation",
   "sessions.reload": "Reload",
   "sessions.empty": "No conversations yet.",
+  "sessions.pinned": "Pinned",
+  "sessions.pin": "Pin",
+  "sessions.unpin": "Unpin",
   "sessions.mine": "My chats",
   "sessions.agent": "Agent chats",
   "sessions.sectionEmpty": "None yet.",
@@ -130,6 +134,8 @@
   "sessions.deleteConfirm": "Delete the conversation “{title}”? This removes it from the agent's history.",
 
   "chat.empty": "Start a conversation with the agent.",
+  "chat.copy": "Copy",
+  "chat.copied": "Copied",
   "chat.toolResult": "Result of {tool}",
   "chat.status.working": "The agent is working…",
   "chat.status.approval": "Waiting for your approval",
