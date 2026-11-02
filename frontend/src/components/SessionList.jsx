@@ -29,18 +29,30 @@ function loadPins() {
   }
 }
 
+function matchesQuery(session, needle) {
+  if (needle === '') return true;
+  const hay = `${session.title || ''} ${session.preview || ''}`.toLocaleLowerCase();
+  return hay.includes(needle);
+}
+
 export function SessionList({ sessions, loading, error, activeId, onSelect, onNew, onRename, onDelete, onReload }) {
   const { t, lang } = useI18n();
   const [editing, setEditing] = useState(null);
   const [title, setTitle] = useState('');
   const [open, setOpen] = useState(loadOpen);
   const [pins, setPins] = useState(loadPins);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const searchBtn = useRef(null);
+  const searchInput = useRef(null);
   const expandedFor = useRef(null);
+  const needle = query.trim().toLocaleLowerCase();
+  const filtering = needle !== '';
   const pinnedSet = new Set(pins);
   const byId = new Map(sessions.map((s) => [s.id, s]));
-  const pinned = pins.map((id) => byId.get(id)).filter(Boolean);
-  const mine = sessions.filter((s) => isMine(s) && !pinnedSet.has(s.id));
-  const agent = sessions.filter((s) => !isMine(s) && !pinnedSet.has(s.id));
+  const pinned = pins.map((id) => byId.get(id)).filter((s) => s && matchesQuery(s, needle));
+  const mine = sessions.filter((s) => isMine(s) && !pinnedSet.has(s.id) && matchesQuery(s, needle));
+  const agent = sessions.filter((s) => !isMine(s) && !pinnedSet.has(s.id) && matchesQuery(s, needle));
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(open));
@@ -49,6 +61,10 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
   useEffect(() => {
     localStorage.setItem(PIN_KEY, JSON.stringify(pins));
   }, [pins]);
+
+  useEffect(() => {
+    if (searchOpen) searchInput.current?.focus();
+  }, [searchOpen]);
 
   useEffect(() => {
     if (!activeId || expandedFor.current === activeId) return;
@@ -60,7 +76,19 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
   }, [activeId, sessions, pins]);
 
   function toggle(key) {
+    if (filtering) return;
     setOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function closeSearch() {
+    setSearchOpen(false);
+    setQuery('');
+    searchBtn.current?.focus();
+  }
+
+  function toggleSearch() {
+    if (searchOpen) closeSearch();
+    else setSearchOpen(true);
   }
 
   function startEdit(s, e) {
@@ -152,7 +180,7 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
   }
 
   function section(key, label, items) {
-    const expanded = open[key];
+    const expanded = filtering || open[key];
     return (
       <div class={`session-section ${expanded ? 'is-open' : ''}`}>
         <button
@@ -175,25 +203,59 @@ export function SessionList({ sessions, loading, error, activeId, onSelect, onNe
   }
 
   const none = !loading && !error && sessions.length === 0;
+  const noMatch = !loading && !error && filtering && sessions.length > 0
+    && pinned.length === 0 && mine.length === 0 && agent.length === 0;
 
   return (
     <div class="d-flex flex-column h-100">
-      <div class="p-2 border-bottom d-flex gap-2">
-        <button class="btn btn-primary btn-sm flex-grow-1" onClick={onNew}>
-          <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
-          {t('sessions.new')}
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" onClick={onReload} title={t('sessions.reload')}>
-          <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
-        </button>
+      <div class="p-2 border-bottom d-flex flex-column gap-2">
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary btn-sm flex-grow-1 min-w-0 text-truncate" onClick={onNew}>
+            <i class="bi bi-plus-lg me-1" aria-hidden="true"></i>
+            {t('sessions.new')}
+          </button>
+          <button
+            ref={searchBtn}
+            type="button"
+            class={`btn btn-sm flex-shrink-0 ${searchOpen ? 'btn-secondary' : 'btn-outline-secondary'}`}
+            onClick={toggleSearch}
+            title={t('sessions.search')}
+            aria-label={t('sessions.search')}
+            aria-expanded={searchOpen}
+            aria-pressed={searchOpen}
+          >
+            <i class="bi bi-search" aria-hidden="true"></i>
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm flex-shrink-0" onClick={onReload} title={t('sessions.reload')} aria-label={t('sessions.reload')}>
+            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+          </button>
+        </div>
+        {searchOpen && (
+          <input
+            type="search"
+            class="form-control form-control-sm"
+            ref={searchInput}
+            placeholder={t('sessions.search')}
+            aria-label={t('sessions.search')}
+            value={query}
+            onInput={(e) => setQuery(e.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key !== 'Escape') return;
+              e.preventDefault();
+              e.stopPropagation();
+              closeSearch();
+            }}
+          />
+        )}
       </div>
       <div class="flex-grow-1 overflow-auto">
         {error && <div class="alert alert-warning m-2 py-2 small">{error}</div>}
         {loading && sessions.length === 0 && <div class="p-3 small text-body-secondary">{t('common.loading')}</div>}
         {none && <div class="p-3 small text-body-secondary">{t('sessions.empty')}</div>}
+        {noMatch && <div class="p-3 small text-body-secondary">{t('sessions.noMatch')}</div>}
         {!loading && pinned.length > 0 && section('pinned', t('sessions.pinned'), pinned)}
-        {!loading && section('mine', t('sessions.mine'), mine)}
-        {!loading && section('agent', t('sessions.agent'), agent)}
+        {!loading && (!filtering || mine.length > 0) && section('mine', t('sessions.mine'), mine)}
+        {!loading && (!filtering || agent.length > 0) && section('agent', t('sessions.agent'), agent)}
       </div>
     </div>
   );

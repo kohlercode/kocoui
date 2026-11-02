@@ -119,6 +119,8 @@
   "jobs.paused": "pausiert",
 
   "sessions.new": "Neue Unterhaltung",
+  "sessions.search": "Unterhaltungen suchen",
+  "sessions.noMatch": "Keine passende Unterhaltung.",
   "sessions.reload": "Neu laden",
   "sessions.empty": "Noch keine Unterhaltungen.",
   "sessions.pinned": "Angeheftet",

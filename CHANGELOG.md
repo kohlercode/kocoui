@@ -4,6 +4,10 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-01
+
+- A search button between New conversation and Reload opens a field that filters the chats already loaded, by title and preview. A second click or Escape closes it. A match in a collapsed section still shows.
+
 ## [1.0.0] - 2026-10-22
 
 - A copy button under each finished agent reply copies that reply as Markdown text. Hovering the button shows a tooltip.

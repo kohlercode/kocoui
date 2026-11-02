@@ -119,6 +119,8 @@
   "jobs.paused": "paused",
 
   "sessions.new": "New conversation",
+  "sessions.search": "Search conversations",
+  "sessions.noMatch": "No matching conversations.",
   "sessions.reload": "Reload",
   "sessions.empty": "No conversations yet.",
   "sessions.pinned": "Pinned",
