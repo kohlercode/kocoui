@@ -30,6 +30,27 @@ final class Work
         return self::root() !== null;
     }
 
+    /** Max bytes for in-app preview (text, media, thumbs). Download is unlimited. */
+    public static function previewMaxBytes(): int
+    {
+        return max(0, (int) Config::get('files.work_preview_max_mb', 50)) * 1024 * 1024;
+    }
+
+    public static function withinPreviewLimit(int $size): bool
+    {
+        $max = self::previewMaxBytes();
+        return $max === 0 ? false : $size <= $max;
+    }
+
+    /** Whether the UI may load an inline preview for this listing row. */
+    public static function previewable(string $kind, bool $text, int $size): bool
+    {
+        if (!self::withinPreviewLimit($size)) {
+            return false;
+        }
+        return $text || in_array($kind, ['image', 'audio', 'video', 'pdf', 'html'], true);
+    }
+
     public static function root(): ?string
     {
         $configured = Config::get('files.work_root', '');
@@ -112,6 +133,10 @@ final class Work
         if (!self::isText($real)) {
             return null;
         }
+        $size = (int) filesize($real);
+        if (!self::withinPreviewLimit($size)) {
+            return null;
+        }
         $fh = fopen($real, 'rb');
         if ($fh === false) {
             return null;
@@ -131,7 +156,7 @@ final class Work
         return ['text' => $data, 'truncated' => $truncated];
     }
 
-    /** @return array{path:string,entries:list<array<string,mixed>>,truncated:bool}|null */
+    /** @return array{path:string,absolute:string,entries:list<array<string,mixed>>,truncated:bool}|null */
     public static function listing(string $input): ?array
     {
         $rel = self::relative($input);
@@ -155,25 +180,38 @@ final class Work
                 continue;
             }
             if (is_dir($path)) {
-                $entries[] = ['name' => $name, 'type' => 'dir', 'path' => $child];
+                $realDir = realpath($path);
+                $entries[] = [
+                    'name' => $name,
+                    'type' => 'dir',
+                    'path' => $child,
+                    'absolute' => $realDir === false ? '' : self::norm($realDir),
+                ];
                 continue;
             }
             if (!is_file($path) || !is_readable($path)) {
                 continue;
             }
             $mime = Files::mime($path);
+            $kind = Files::kind($mime);
+            $size = (int) filesize($path);
+            $text = self::isText($name);
+            $realFile = realpath($path);
             $row = [
                 'name' => $name,
                 'type' => 'file',
                 'path' => $child,
-                'size' => (int) filesize($path),
+                'absolute' => $realFile === false ? '' : self::norm($realFile),
+                'size' => $size,
                 'mime' => $mime,
-                'kind' => Files::kind($mime),
+                'kind' => $kind,
                 'modified' => (int) filemtime($path),
-                'text' => self::isText($name),
+                'text' => $text,
+                'oversized' => !self::withinPreviewLimit($size),
+                'previewable' => self::previewable($kind, $text, $size),
                 'url' => '/api/work/file?path=' . rawurlencode($child),
             ];
-            if (Files::thumbable($mime)) {
+            if (Files::thumbable($mime) && self::withinPreviewLimit($size)) {
                 $row['thumb'] = '/api/work/thumb?path=' . rawurlencode($child);
             }
             $entries[] = $row;
@@ -187,7 +225,12 @@ final class Work
         if ($truncated) {
             $entries = array_slice($entries, 0, self::LIST_LIMIT);
         }
-        return ['path' => $rel, 'entries' => $entries, 'truncated' => $truncated];
+        return [
+            'path' => $rel,
+            'absolute' => $dir,
+            'entries' => $entries,
+            'truncated' => $truncated,
+        ];
     }
 
     private static function within(string $root, string $path): bool

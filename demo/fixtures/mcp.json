@@ -1,0 +1,31 @@
+{
+  "source": "mcp",
+  "data": [
+    {
+      "name": "github",
+      "state": "connected",
+      "transport": "stdio",
+      "tool_count": 3,
+      "tools": ["mcp_github_list_issues", "mcp_github_create_issue", "mcp_github_search_code"]
+    },
+    {
+      "name": "docs",
+      "state": "lazy",
+      "transport": "streamable_http",
+      "tool_count": 2,
+      "tools": ["mcp_docs_search", "mcp_docs_fetch"]
+    },
+    {
+      "name": "linear",
+      "state": "failed",
+      "transport": "streamable_http",
+      "tool_count": 0
+    },
+    {
+      "name": "legacy",
+      "state": "disabled",
+      "transport": "sse",
+      "tool_count": 0
+    }
+  ]
+}

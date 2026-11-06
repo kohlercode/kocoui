@@ -14,7 +14,16 @@ import { FilesPanel, conversationFiles } from './FilesPanel.jsx';
 import { COMMANDS, parseSlash, resolveCommand } from '../commands.js';
 import { play } from '../sounds.js';
 
-export function ChatView({ initialSessionId, models, limits, onSessionCreated, onRunFinished, onNewChat }) {
+export function ChatView({
+  initialSessionId,
+  initialDraft = '',
+  models,
+  limits,
+  onSessionCreated,
+  onRunFinished,
+  onNewChat,
+  onDraftConsumed,
+}) {
   const { t } = useI18n();
   const attachments = useAttachments(limits);
   const [model, setModel] = useState(storedModel);
@@ -24,13 +33,20 @@ export function ChatView({ initialSessionId, models, limits, onSessionCreated, o
   const [loadError, setLoadError] = useState('');
   const [run, setRun] = useState(null);
   const [notice, setNotice] = useState(null);
-  const [draft, setDraft] = useState('');
+  const [draft, setDraft] = useState(() => String(initialDraft || ''));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const tracker = useRef(null);
   const pendingSubmit = useRef(null);
   const scroller = useRef(null);
   const stick = useRef(true);
+  const draftConsumed = useRef(false);
+
+  useEffect(() => {
+    if (draftConsumed.current || !initialDraft) return;
+    draftConsumed.current = true;
+    onDraftConsumed?.();
+  }, [initialDraft, onDraftConsumed]);
 
   const loadMessages = useCallback(async (sid) => {
     try {

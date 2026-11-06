@@ -16,7 +16,7 @@ Install with the scripts in this repo, on an Ubuntu VPS where Hermes is already 
 
 **[Try the demo](https://kohlercode.github.io/kocoui/)**
 
-The demo is this interface: the same screens and styles, filled with example conversations. You can browse chats, files, the work folder, tools, jobs, and the persona page, and you can switch the language and the theme. Sending a message, uploading a file, or anything else that would change data opens a note instead. The sample content stays as it is.
+The demo is this interface: the same screens and styles, filled with example conversations. You can browse chats, files, the work folder, tools, MCP servers, jobs, and the persona page, and you can switch the language and the theme. Sending a message, uploading a file, or anything else that would change data opens a note instead. The sample content stays as it is.
 
 A push to `main` that changes the interface publishes a new demo.
 
@@ -46,7 +46,7 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 - Streaming replies rendered as sanitized GitHub-flavored Markdown
 - Inline approval cards when Hermes wants to run a command (`once`, `session`, `always`, `deny`)
 - Steer a running turn, or stop it
-- Model picker, tools and skills list, scheduled jobs
+- Model picker, tools and skills list, MCP server list, scheduled jobs
 - Uploads (button, drag and drop, paste) and files the agent sends back, with an album and a lightbox
 - Read-only Work view of one directory the agent writes, off until that directory is configured
 - Persona page that edits Hermes `SOUL.md` in place

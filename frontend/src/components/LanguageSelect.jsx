@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { LANGUAGES, useI18n } from '../i18n/index.js';
+import { useTooltip } from '../useTooltip.js';
 
 export function LanguageSelect({ className = '' }) {
   const { lang, setLang, t } = useI18n();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const buttonRef = useRef(null);
+  const label = t('nav.language');
+  useTooltip(buttonRef, label);
 
   useEffect(() => {
     if (!open) return;
@@ -27,10 +31,10 @@ export function LanguageSelect({ className = '' }) {
       <button
         type="button"
         class="btn btn-outline-secondary"
+        ref={buttonRef}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={t('nav.language')}
-        title={t('nav.language')}
+        aria-label={label}
         onClick={() => setOpen((v) => !v)}
       >
         <i class="bi bi-globe" aria-hidden="true"></i>

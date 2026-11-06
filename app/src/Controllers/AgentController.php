@@ -7,8 +7,9 @@ use KocoUI\Hermes\HermesClient;
 use KocoUI\Http\HttpError;
 use KocoUI\Http\Request;
 use KocoUI\Http\Response;
+use KocoUI\McpServers;
 
-/** Read-only views of the agent's setup: models, toolsets, skills, scheduled jobs. */
+/** Read-only views of the agent's setup: models, toolsets, skills, MCP servers, scheduled jobs. */
 final class AgentController
 {
     public static function models(Request $req): never
@@ -75,6 +76,28 @@ final class AgentController
             ];
         }
         Response::json(['data' => $out, 'available' => true]);
+    }
+
+    public static function mcpServers(Request $req): never
+    {
+        $client = new HermesClient();
+        try {
+            $live = McpServers::fromHermes($client->mcpServers());
+            try {
+                $live = McpServers::withTools($live, McpServers::fromToolsets($client->toolsets()));
+            } catch (HttpError) {
+                // Status from /v1/mcp/servers is enough.
+            }
+            Response::json(['data' => $live, 'source' => 'mcp']);
+        } catch (HttpError $e) {
+            if (in_array($e->errorCode, ['hermes_unreachable', 'hermes_auth'], true)) {
+                throw $e;
+            }
+            if ($e->status !== 404 && $e->status !== 502) {
+                throw $e;
+            }
+        }
+        Response::json(['data' => McpServers::fromToolsets($client->toolsets()), 'source' => 'toolsets']);
     }
 
     public static function jobs(Request $req): never

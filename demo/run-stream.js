@@ -37,6 +37,7 @@ export class DemoEventSource {
       this.emit({
         event: 'approval.request',
         request_id: approval.request_id,
+        execution_generation: approval.execution_generation,
         command: approval.command,
         description: approval.description,
         choices: approval.choices,

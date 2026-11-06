@@ -42,8 +42,10 @@ return static function (): void {
     TestCase::assertTrue(str_ends_with($clean, '.txt'), 'extension kept');
     TestCase::assertSame('bericht-ü.txt', Files::sanitizeName('bericht-ü.txt'), 'utf-8');
 
-    TestCase::assertSame('file', Files::kind('image/svg+xml'), 'svg is not an image');
+    TestCase::assertSame('image', Files::kind('image/svg+xml'), 'svg is an image');
     TestCase::assertSame('image', Files::kind('image/png'), 'png');
-    TestCase::assertFalse(Files::inlineSafe('text/html'), 'html not inline');
+    TestCase::assertSame('html', Files::kind('text/html'), 'html kind');
+    TestCase::assertTrue(Files::inlineSafe('image/svg+xml'), 'svg inline as image');
+    TestCase::assertFalse(Files::inlineSafe('text/html'), 'html not globally inline');
     TestCase::assertTrue(Files::inlineSafe('application/pdf'), 'pdf inline');
 };

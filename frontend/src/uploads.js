@@ -56,6 +56,7 @@ export function fileIcon(mime = '', kind = '') {
   if (kind === 'video' || mime.startsWith('video/')) return 'bi-file-earmark-play';
   if (kind === 'audio' || mime.startsWith('audio/')) return 'bi-file-earmark-music';
   if (kind === 'pdf' || mime === 'application/pdf') return 'bi-file-earmark-pdf';
+  if (kind === 'html' || mime === 'text/html') return 'bi-filetype-html';
   if (/zip|tar|gzip|7z|rar|compressed/.test(mime)) return 'bi-file-earmark-zip';
   if (/spreadsheet|excel|csv/.test(mime)) return 'bi-file-earmark-spreadsheet';
   if (/word|document|rtf/.test(mime)) return 'bi-file-earmark-richtext';

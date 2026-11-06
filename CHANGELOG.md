@@ -4,6 +4,16 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-06
+
+- Work view previews: SVG as images, padded media, syntax-highlighted source, HTML in a sandboxed modal, and a clear download panel for types that cannot be previewed (for example spreadsheets).
+- Work view skips inline preview above `files.work_preview_max_mb` (default 50). Download still works. Existing installs without that key keep the default.
+- Ask agent about a Work file or folder opens a new chat with that path already in the composer draft.
+- A read-only MCP page lists this agent's connected servers (name, state, transport, tools). It uses Hermes `GET /v1/mcp/servers` when that exists, and otherwise the `mcp-*` toolsets. It does not read `config.yaml` or show credentials.
+- Approvals send Hermes 0.22's required `request_id` and `execution_generation`, so Allow/Deny works again after that upgrade.
+- Navbar view and account controls show icons only; the previous labels are bottom tooltips.
+- Outside the app: nginx needs `/_work_html/` (SAMEORIGIN framing plus a sandbox CSP) for HTML previews. A release deploy does not rewrite that snippet; re-run `provision.sh --work-root` or update the snippet and reload nginx.
+
 ## [1.1.0] - 2026-11-01
 
 - A search button between New conversation and Reload opens a field that filters the chats already loaded, by title and preview. A second click or Escape closes it. A match in a collapsed section still shows.

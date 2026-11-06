@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace KocoUI\Controllers;
 
+use KocoUI\Approval;
 use KocoUI\Config;
 use KocoUI\DeletedSessions;
 use KocoUI\Files;
@@ -35,6 +36,7 @@ final class ChatController
                 'max_upload_bytes' => FilesController::maxBytes(),
                 'max_per_message' => (int) Config::get('files.max_per_message', 10),
                 'work' => Work::enabled(),
+                'work_preview_max_bytes' => Work::previewMaxBytes(),
             ],
         ]);
     }
@@ -132,7 +134,21 @@ final class ChatController
 
     public static function runStatus(Request $req, array $p): never
     {
-        Response::json((new HermesClient())->runStatus($p['id']));
+        $res = (new HermesClient())->runStatus($p['id']);
+        $out = [
+            'run_id' => $res['run_id'] ?? $p['id'],
+            'status' => $res['status'] ?? null,
+        ];
+        $approval = Approval::fromHermesStatus($res);
+        if ($approval !== null) {
+            $out['approval'] = $approval;
+        }
+        foreach (['error', 'output'] as $k) {
+            if (array_key_exists($k, $res)) {
+                $out[$k] = $res[$k];
+            }
+        }
+        Response::json($out);
     }
 
     public static function runEvents(Request $req, array $p): never
@@ -173,7 +189,19 @@ final class ChatController
             throw new HttpError(400, 'invalid_approval_choice', 'Choice must be once, session, always or deny');
         }
         $requestId = $req->string('request_id', 256);
-        Response::json((new HermesClient())->approve($p['id'], $choice, $requestId));
+        $generation = Approval::generation($req->json()['execution_generation'] ?? null);
+        if (($req->json()['execution_generation'] ?? null) !== null && $generation === null) {
+            throw new HttpError(400, 'invalid_input', 'execution_generation must be a positive integer');
+        }
+        if ($generation !== null && $requestId === '') {
+            throw new HttpError(400, 'invalid_approval_request', 'Approval request_id is required');
+        }
+        Response::json((new HermesClient())->approve(
+            $p['id'],
+            $choice,
+            $requestId === '' ? null : $requestId,
+            $generation,
+        ));
     }
 
     public static function steer(Request $req, array $p): never

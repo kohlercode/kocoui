@@ -55,7 +55,9 @@ Pass `--work-root` again whenever you re-run `provision.sh`. Leaving it out turn
 
 `files.work_root` has to match the path provision wrote into nginx and `open_basedir`. Changing the directory means running provision again with the new `--work-root`. `deploy/audit.sh` checks that the three copies match, that the app can read the directory, and that it cannot create a file there.
 
-PDFs from that directory open inside the page. The nginx location that serves them allows framing by this site only (`X-Frame-Options: SAMEORIGIN`). Every other response stays `DENY`. A release deploy does not rewrite that snippet.
+`files.work_preview_max_mb` (default `50`) caps inline previews in the Work view (text, images, media, PDF, SVG). Larger files stay listed and downloadable. Existing `config.php` files without the key use 50.
+
+PDFs and HTML from that directory open inside the page (HTML in a sandboxed modal). The nginx locations that serve them (`/_work_pdf/`, `/_work_html/`) allow framing by this site only (`X-Frame-Options: SAMEORIGIN`). Every other response stays `DENY`. A release deploy does not rewrite that snippet.
 
 ## 3. Deploy the app
 

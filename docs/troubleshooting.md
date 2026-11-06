@@ -14,6 +14,12 @@ Hermes writes the auto-generated title a few seconds after a turn ends. A delete
 
 Kocoui remembers deleted session ids and hides them, then deletes again. Tombstones are kept for a few days so the daily file prune can still find them.
 
+## The MCP page is empty
+
+KocoUI does not read Hermes `config.yaml`. It asks the API for `GET /v1/mcp/servers`. The installed Hermes API often answers 404 for that path. Then the page lists `mcp-*` toolsets instead. A server that is in the config but failed to connect will not appear.
+
+Add or repair servers with `hermes mcp` as the agent user, then restart `hermes-gateway` or use `/reload-mcp` in a Hermes session.
+
 ## The skills page says unavailable
 
 Hermes 0.21.5 (and upstream main on 2026-09-29) crashes on `GET /v1/skills` because it passes `include_editorial=True` to a function that no longer accepts that argument. Kocoui treats that 5xx as "skills unavailable" so the rest of the UI keeps working.

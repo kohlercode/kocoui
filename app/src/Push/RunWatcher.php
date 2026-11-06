@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace KocoUI\Push;
 
+use KocoUI\Approval;
 use KocoUI\Config;
 use KocoUI\Hermes\HermesClient;
 use KocoUI\Http\HttpError;
@@ -40,7 +41,7 @@ final class RunWatcher
         $app = (string) Config::get('app_name', 'Hermes');
         $url = Notifier::sessionUrl($sessionId);
         if ($status === 'waiting_for_approval') {
-            $reqId = (string) ($st['approval']['request_id'] ?? $st['approval']['id'] ?? 'pending');
+            $reqId = (string) (Approval::fromHermesStatus($st)['request_id'] ?? 'pending');
             Notifier::once($userId, $runId, 'approval:' . $reqId, [
                 'title' => $app,
                 'body' => 'Approval needed',

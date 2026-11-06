@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace KocoUI\Hermes;
 
+use KocoUI\Approval;
 use KocoUI\Config;
 use KocoUI\Http\HttpError;
 
@@ -42,13 +43,13 @@ final class HermesClient
         return $this->request('GET', '/v1/runs/' . rawurlencode($runId), null, [], $timeout);
     }
 
-    public function approve(string $runId, string $choice, ?string $requestId = null): array
+    public function approve(string $runId, string $choice, ?string $requestId = null, ?int $executionGeneration = null): array
     {
-        $body = ['choice' => $choice];
-        if ($requestId !== null && $requestId !== '') {
-            $body['request_id'] = $requestId;
-        }
-        return $this->request('POST', '/v1/runs/' . rawurlencode($runId) . '/approval', $body);
+        return $this->request(
+            'POST',
+            '/v1/runs/' . rawurlencode($runId) . '/approval',
+            Approval::hermesBody($choice, $requestId ?? '', $executionGeneration),
+        );
     }
 
     public function steer(string $runId, string $text): array
@@ -99,6 +100,11 @@ final class HermesClient
     public function toolsets(): array
     {
         return $this->request('GET', '/v1/toolsets');
+    }
+
+    public function mcpServers(): array
+    {
+        return $this->request('GET', '/v1/mcp/servers');
     }
 
     public function modelOptions(): array
@@ -199,7 +205,7 @@ final class HermesClient
             return is_array($data) ? $data : [];
         }
 
-        $err = is_array($data['error'] ?? null) ? $data['error'] : [];
+        $err = is_array($data) && is_array($data['error'] ?? null) ? $data['error'] : [];
         $code = (string) ($err['code'] ?? '');
         $message = (string) ($err['message'] ?? 'Agent error');
         if ($status === 401 || $status === 403) {

@@ -3,6 +3,38 @@ import { api } from './api.js';
 const TERMINAL = new Set(['completed', 'failed', 'cancelled', 'interrupted', 'lost']);
 export const isTerminal = (status) => TERMINAL.has(status);
 
+function generationOf(raw, fallback) {
+  const n = raw?.execution_generation ?? fallback;
+  if (Number.isInteger(n) && n >= 1) return n;
+  if (typeof n === 'string' && /^\d+$/.test(n)) {
+    const parsed = Number(n);
+    return parsed >= 1 ? parsed : undefined;
+  }
+  return undefined;
+}
+
+function normalizeApproval(raw, fallbackGeneration) {
+  if (!raw || typeof raw !== 'object') return null;
+  const request_id = raw.request_id || raw.prompt_id || '';
+  const execution_generation = generationOf(raw, fallbackGeneration);
+  return {
+    ...raw,
+    request_id,
+    ...(execution_generation != null ? { execution_generation } : {}),
+  };
+}
+
+function approvalFromStatus(st, prev) {
+  if (st.status !== 'waiting_for_approval') return null;
+  if (st.approval) return normalizeApproval(st.approval, st.execution_generation);
+  const pending = Array.isArray(st.pending_controls) ? st.pending_controls : [];
+  const prompt = pending.find((p) => p && p.kind === 'approval') || pending[0];
+  if (prompt) return normalizeApproval(prompt, st.execution_generation);
+  if (!prev) return null;
+  const execution_generation = generationOf(prev, st.execution_generation);
+  return execution_generation != null ? { ...prev, execution_generation } : prev;
+}
+
 const runKey = (sessionId) => `kocoui.run.${sessionId}`;
 export const rememberRun = (sessionId, runId) => sessionStorage.setItem(runKey(sessionId), runId);
 export const rememberedRun = (sessionId) => sessionStorage.getItem(runKey(sessionId));
@@ -51,11 +83,14 @@ export class RunTracker {
   }
 
   async approve(choice) {
-    const requestId = this.state.approval?.request_id;
+    const approval = this.state.approval || {};
+    const requestId = approval.request_id || approval.prompt_id;
+    const generation = generationOf(approval);
     try {
       await api('POST', `/api/runs/${encodeURIComponent(this.runId)}/approval`, {
         choice,
         ...(requestId ? { request_id: requestId } : {}),
+        ...(generation != null ? { execution_generation: generation } : {}),
       });
       this.update({ approval: null, status: 'running' });
     } catch (e) {
@@ -136,7 +171,7 @@ export class RunTracker {
         break;
       }
       case 'approval.request':
-        this.update({ approval: ev, status: 'waiting_for_approval' });
+        this.update({ approval: normalizeApproval(ev), status: 'waiting_for_approval' });
         break;
       case 'approval.responded':
         this.update({ approval: null, status: 'running' });
@@ -162,7 +197,7 @@ export class RunTracker {
       }
       this.update({
         status: st.status,
-        approval: st.status === 'waiting_for_approval' ? st.approval || this.state.approval : null,
+        approval: approvalFromStatus(st, this.state.approval),
       });
     } catch (e) {
       if (e.status === 404) {

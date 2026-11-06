@@ -134,7 +134,7 @@ if [ -n "$FILES_ROOT" ]; then
       *) work_outside=yes ;;
     esac
     check "work root is outside the Hermes config directory" "$work_outside" "yes"
-    check "nginx work alias matches the work root" "$(grep -F -c "alias ${WORK_ROOT}/;" /etc/nginx/snippets/hermesweb-work.conf 2>/dev/null || true)" "2"
+    check "nginx work alias matches the work root" "$(grep -F -c "alias ${WORK_ROOT}/;" /etc/nginx/snippets/hermesweb-work.conf 2>/dev/null || true)" "3"
     check "app can read the work directory" "$(runuser -u "$APP_USER" -- test -r "$WORK_ROOT" -a -x "$WORK_ROOT" && echo yes || echo no)" "yes"
     check "app cannot write the work directory" "$(tries "$APP_USER" "$WORK_ROOT")" "no"
     SAMPLE=$(find "$WORK_ROOT" -xdev -type f -print -quit 2>/dev/null || true)

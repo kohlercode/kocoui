@@ -23,9 +23,17 @@ final class WorkController
         $rel = self::path($req);
         $real = Work::file($rel) ?? throw new HttpError(404, 'not_found', 'File not found');
         $mime = Files::mime($real);
-        $download = ($req->query['download'] ?? '') === '1' || !Files::inlineSafe($mime);
-        $type = Files::inlineSafe($mime) ? $mime : 'application/octet-stream';
-        $location = $mime === 'application/pdf' && !$download ? '/_work_pdf/' : '/_work/';
+        $wantDownload = ($req->query['download'] ?? '') === '1';
+        $oversize = !Work::withinPreviewLimit((int) filesize($real));
+        // HTML is inline only here (frameable /_work_html/), not via Files::inlineSafe for chat.
+        $canInline = Files::inlineSafe($mime) || $mime === 'text/html';
+        $download = $wantDownload || !$canInline || $oversize;
+        $type = (!$download && $canInline) ? $mime : 'application/octet-stream';
+        $location = match (true) {
+            $mime === 'application/pdf' && !$download => '/_work_pdf/',
+            $mime === 'text/html' && !$download => '/_work_html/',
+            default => '/_work/',
+        };
         $name = basename($real);
         $ascii = preg_replace('/[^\x20-\x7E]|["\\\\]/', '_', $name);
         $relative = Work::relativeOf($real);
@@ -42,6 +50,12 @@ final class WorkController
     {
         $rel = self::path($req);
         $real = Work::file($rel) ?? throw new HttpError(404, 'not_found', 'File not found');
+        $size = (int) filesize($real);
+        if (!Work::withinPreviewLimit($size)) {
+            throw new HttpError(413, 'preview_too_large', 'This file is too large to preview', [
+                'max_bytes' => Work::previewMaxBytes(),
+            ]);
+        }
         $body = Work::readText($real) ?? throw new HttpError(415, 'not_text', 'This file cannot be previewed as text');
         Response::json($body);
     }
@@ -50,6 +64,11 @@ final class WorkController
     {
         $rel = self::path($req);
         $real = Work::file($rel) ?? throw new HttpError(404, 'not_found', 'File not found');
+        if (!Work::withinPreviewLimit((int) filesize($real))) {
+            throw new HttpError(413, 'preview_too_large', 'This file is too large to preview', [
+                'max_bytes' => Work::previewMaxBytes(),
+            ]);
+        }
         $width = (int) ($req->query['w'] ?? 480);
         if (!Files::thumbable(Files::mime($real))) {
             throw new HttpError(415, 'no_thumbnail', 'No thumbnail for this file type');

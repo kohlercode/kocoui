@@ -14,7 +14,7 @@ final class Files
     public const THUMB_WIDTHS = [160, 320, 480, 960];
 
     private const INLINE_TYPES = [
-        'image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/avif', 'image/bmp',
+        'image/png', 'image/jpeg', 'image/gif', 'image/webp', 'image/avif', 'image/bmp', 'image/svg+xml',
         'video/mp4', 'video/webm', 'video/ogg',
         'audio/mpeg', 'audio/ogg', 'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/flac', 'audio/x-flac',
         'audio/mp4', 'audio/aac', 'audio/x-m4a',
@@ -74,17 +74,24 @@ final class Files
         if ($mime === 'video/webm' && $ext === 'weba') {
             return 'audio/webm';
         }
+        // Tiny or atypical SVG payloads are often sniffed as text/html or text/plain.
+        if ($ext === 'svg' || $ext === 'svgz') {
+            return 'image/svg+xml';
+        }
+        if ($ext === 'html' || $ext === 'htm') {
+            return 'text/html';
+        }
         return $mime;
     }
 
     public static function kind(string $mime): string
     {
         return match (true) {
-            $mime === 'image/svg+xml' => 'file',
             str_starts_with($mime, 'image/') => 'image',
             in_array($mime, ['video/mp4', 'video/webm', 'video/ogg'], true) => 'video',
             str_starts_with($mime, 'audio/') => 'audio',
             $mime === 'application/pdf' => 'pdf',
+            $mime === 'text/html' => 'html',
             default => 'file',
         };
     }

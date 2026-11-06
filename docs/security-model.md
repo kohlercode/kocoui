@@ -7,7 +7,7 @@ Signing in is still the front door of a machine. A signed-in user can ask the ag
 ## What a signed-in user can do
 
 - Send chat, steer or stop a run, and answer tool approvals (`once`, `session`, `always`, `deny`).
-- List models, toolsets, and skills, and manage scheduled jobs when Hermes exposes that feature.
+- List models, toolsets, skills, and MCP servers, and manage scheduled jobs when Hermes exposes that feature. MCP rows are names and connection state only. The app does not read Hermes `config.yaml` and does not show URLs, commands, or tokens.
 - Upload files and open files the agent has already produced, through the app's file routes.
 - Browse one work directory, when the operator has configured it. The app reads that directory and does not write it.
 - Read and save the persona file `SOUL.md`, and restore the one previous copy the app keeps.

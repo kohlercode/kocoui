@@ -26,11 +26,14 @@ return [
     // empty to hide that view. Set it with provision.sh --work-root, and do not point it
     // at the Hermes home or ~/.hermes. The value must match the path provision wrote
     // into nginx and open_basedir.
+    // work_preview_max_mb caps inline previews in the Work view (text, images, media, PDF).
+    // Larger files stay downloadable. Existing installs without this key default to 50.
     'files' => [
         'root' => '/srv/kocoui/files',
         'work_root' => '',
         'max_upload_mb' => 50,
         'max_per_message' => 10,
+        'work_preview_max_mb' => 50,
     ],
 
     'security' => [

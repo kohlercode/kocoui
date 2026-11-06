@@ -2,18 +2,31 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'preac
 import { api, setCsrf } from '../api.js';
 import { useI18n } from '../i18n/index.js';
 import { getTheme, setTheme } from '../theme.js';
+import { useTooltip } from '../useTooltip.js';
 import { ThemePanel } from './ThemePanel.jsx';
 import { errorText } from '../util.js';
 import { LanguageSelect } from './LanguageSelect.jsx';
 import { SessionList } from './SessionList.jsx';
 import { ChatView } from './ChatView.jsx';
 import { ToolsView } from './ToolsView.jsx';
+import { McpView } from './McpView.jsx';
 import { JobsView } from './JobsView.jsx';
 import { PersonaView } from './PersonaView.jsx';
 import { WorkView } from './WorkView.jsx';
 import { disablePush, enablePush, pushPrefOn, pushSupported } from '../push.js';
 import { play, setSoundsEnabled, soundsEnabled } from '../sounds.js';
 import { SessionWarning } from './SessionWarning.jsx';
+
+/** Icon-only button with a bottom Bootstrap tooltip (label stays for a11y). */
+function IconBtn({ class: className, label, onClick, icon, type = 'button', ...rest }) {
+  const ref = useRef(null);
+  useTooltip(ref, label);
+  return (
+    <button type={type} class={className} ref={ref} onClick={onClick} aria-label={label} {...rest}>
+      <i class={icon} aria-hidden="true"></i>
+    </button>
+  );
+}
 
 const SIDEBAR_WIDTH_KEY = 'kocoui.sidebarWidth';
 const SIDEBAR_DEFAULT = 290;
@@ -50,6 +63,7 @@ function sessionFromHash() {
 
 function viewFromHash() {
   if (location.hash === '#/tools') return 'tools';
+  if (location.hash === '#/mcp') return 'mcp';
   if (location.hash === '#/jobs') return 'jobs';
   if (location.hash === '#/persona') return 'persona';
   if (location.hash === '#/work') return 'work';
@@ -79,6 +93,7 @@ export function Layout({ user, session = null, onLoggedOut }) {
   const [features, setFeatures] = useState({});
   const [models, setModels] = useState(null);
   const [limits, setLimits] = useState(null);
+  const [chatDraft, setChatDraft] = useState('');
   const appName = document.documentElement.dataset.appName || 'Hermes';
   const rawVersion = document.documentElement.dataset.appVersion || '';
   const appVersion = /^\d+\.\d+\.\d+$/.test(rawVersion) ? rawVersion : '';
@@ -134,6 +149,16 @@ export function Layout({ user, session = null, onLoggedOut }) {
     if (v === 'chat') return select(activeId);
     location.hash = `#/${v}`;
     setView(v);
+  }
+
+  /** Open a blank chat with a seeded composer draft (Work → Ask agent). */
+  function askWork(draft) {
+    setChatDraft(String(draft || ''));
+    setSidebarOpen(false);
+    setView('chat');
+    location.hash = '';
+    setActiveId(null);
+    setViewKey((k) => k + 1);
   }
 
   const onSessionCreated = useCallback((id) => {
@@ -273,9 +298,12 @@ export function Layout({ user, session = null, onLoggedOut }) {
     <div class="d-flex flex-column h-100">
       <nav class="navbar border-bottom bg-body-tertiary px-2 px-md-3 flex-nowrap">
         <div class="d-flex align-items-center gap-2 min-w-0">
-          <button class="btn btn-outline-secondary d-md-none" onClick={() => setSidebarOpen((o) => !o)} aria-label={t('nav.sessions')}>
-            <i class="bi bi-list" aria-hidden="true"></i>
-          </button>
+          <IconBtn
+            class="btn btn-outline-secondary d-md-none"
+            label={t('nav.sessions')}
+            icon="bi bi-list"
+            onClick={() => setSidebarOpen((o) => !o)}
+          />
           <span class="navbar-brand mb-0 h1 text-truncate d-none d-lg-inline">
             <i class="bi bi-robot me-2" aria-hidden="true"></i>
             {appName}
@@ -288,45 +316,57 @@ export function Layout({ user, session = null, onLoggedOut }) {
         </div>
         <div class="d-flex align-items-center gap-2">
           <div class="btn-group" role="group" aria-label={t('nav.views')}>
-            <button class={`btn ${view === 'chat' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('chat')} title={t('nav.chat')}>
-              <i class="bi bi-chat-left-text" aria-hidden="true"></i>
-              <span class="d-none d-lg-inline ms-1">{t('nav.chat')}</span>
-            </button>
+            <IconBtn
+              class={`btn ${view === 'chat' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              label={t('nav.chat')}
+              icon="bi bi-chat-left-text"
+              onClick={() => show('chat')}
+            />
             {limits?.work && (
-              <button class={`btn ${view === 'work' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('work')} title={t('nav.work')}>
-                <i class="bi bi-folder" aria-hidden="true"></i>
-                <span class="d-none d-lg-inline ms-1">{t('nav.work')}</span>
-              </button>
+              <IconBtn
+                class={`btn ${view === 'work' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                label={t('nav.work')}
+                icon="bi bi-folder"
+                onClick={() => show('work')}
+              />
             )}
-            <button class={`btn ${view === 'tools' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('tools')} title={t('nav.tools')}>
-              <i class="bi bi-tools" aria-hidden="true"></i>
-              <span class="d-none d-lg-inline ms-1">{t('nav.tools')}</span>
-            </button>
+            <IconBtn
+              class={`btn ${view === 'tools' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              label={t('nav.tools')}
+              icon="bi bi-tools"
+              onClick={() => show('tools')}
+            />
+            <IconBtn
+              class={`btn ${view === 'mcp' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              label={t('nav.mcp')}
+              icon="bi bi-plugin"
+              onClick={() => show('mcp')}
+            />
             {features.jobs_admin && (
-              <button class={`btn ${view === 'jobs' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('jobs')} title={t('nav.jobs')}>
-                <i class="bi bi-clock-history" aria-hidden="true"></i>
-                <span class="d-none d-lg-inline ms-1">{t('nav.jobs')}</span>
-              </button>
+              <IconBtn
+                class={`btn ${view === 'jobs' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+                label={t('nav.jobs')}
+                icon="bi bi-clock-history"
+                onClick={() => show('jobs')}
+              />
             )}
-            <button class={`btn ${view === 'persona' ? 'btn-secondary' : 'btn-outline-secondary'}`} onClick={() => show('persona')} title={t('nav.persona')}>
-              <i class="bi bi-person-heart" aria-hidden="true"></i>
-              <span class="d-none d-lg-inline ms-1">{t('nav.persona')}</span>
-            </button>
+            <IconBtn
+              class={`btn ${view === 'persona' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              label={t('nav.persona')}
+              icon="bi bi-person-heart"
+              onClick={() => show('persona')}
+            />
           </div>
           <LanguageSelect />
           <div class="dropdown" ref={settingsRef}>
-            <button
-              type="button"
-              class="btn btn-outline-secondary dropdown-toggle"
+            <IconBtn
+              class="btn btn-outline-secondary"
+              label={t('nav.settings')}
+              icon="bi bi-gear"
               aria-expanded={settingsOpen}
               aria-haspopup="menu"
-              aria-label={t('nav.settings')}
-              title={t('nav.settings')}
               onClick={() => setSettingsOpen((open) => !open)}
-            >
-              <i class="bi bi-gear" aria-hidden="true"></i>
-              <span class="d-none d-lg-inline ms-1">{t('nav.settings')}</span>
-            </button>
+            />
             <ul class={`dropdown-menu dropdown-menu-end ${settingsOpen ? 'show' : ''}`} role="menu">
               <li>
                 <button
@@ -393,10 +433,12 @@ export function Layout({ user, session = null, onLoggedOut }) {
             <i class="bi bi-person-circle me-1" aria-hidden="true"></i>
             {user.username}
           </span>
-          <button class="btn btn-outline-danger" onClick={logout} title={t('nav.logout')}>
-            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-            <span class="d-none d-md-inline ms-1">{t('nav.logout')}</span>
-          </button>
+          <IconBtn
+            class="btn btn-outline-danger"
+            label={t('nav.logout')}
+            icon="bi bi-box-arrow-right"
+            onClick={logout}
+          />
         </div>
       </nav>
       <ThemePanel open={themeOpen} mode={theme} onMode={chooseMode} onClose={() => setThemeOpen(false)} />
@@ -434,17 +476,20 @@ export function Layout({ user, session = null, onLoggedOut }) {
             <ChatView
               key={viewKey}
               initialSessionId={activeId}
+              initialDraft={chatDraft}
               models={models}
               limits={limits}
               onSessionCreated={onSessionCreated}
               onRunFinished={loadSessions}
               onNewChat={() => select(null)}
+              onDraftConsumed={() => setChatDraft('')}
             />
           </div>
           {view === 'tools' && <ToolsView />}
+          {view === 'mcp' && <McpView />}
           {view === 'jobs' && (features.jobs_admin ? <JobsView /> : <div class="p-4 text-body-secondary">{t('jobs.disabled')}</div>)}
           {view === 'persona' && <PersonaView />}
-          {view === 'work' && <WorkView />}
+          {view === 'work' && <WorkView onAskAgent={askWork} />}
         </main>
       </div>
     </div>
