@@ -5,6 +5,7 @@ namespace KocoUI;
 
 use KocoUI\Controllers\AgentController;
 use KocoUI\Controllers\AuthController;
+use KocoUI\Controllers\BrandingController;
 use KocoUI\Controllers\ChatController;
 use KocoUI\Controllers\FilesController;
 use KocoUI\Controllers\GatewayController;
@@ -37,6 +38,9 @@ final class App
         if (!str_starts_with($req->path, '/api/')) {
             if ($req->path === '/manifest.webmanifest' && in_array($req->method, ['GET', 'HEAD'], true)) {
                 self::manifest();
+            }
+            if (in_array($req->method, ['GET', 'HEAD'], true) && Branding::tryServe($req->path)) {
+                return;
             }
             if (!in_array($req->method, ['GET', 'HEAD'], true) || str_contains(basename($req->path), '.')) {
                 http_response_code(404);
@@ -83,6 +87,10 @@ final class App
         $r->add('GET', '/api/persona', [PersonaController::class, 'show']);
         $r->add('PUT', '/api/persona', [PersonaController::class, 'save']);
         $r->add('POST', '/api/persona/restore', [PersonaController::class, 'restore']);
+        $r->add('GET', '/api/branding', [BrandingController::class, 'show']);
+        $r->add('PUT', '/api/branding', [BrandingController::class, 'save']);
+        $r->add('PUT', '/api/branding/icons/{slot}', [BrandingController::class, 'uploadIcon']);
+        $r->add('DELETE', '/api/branding/icons/{slot}', [BrandingController::class, 'deleteIcon']);
         $r->add('GET', '/api/gateway/status', [GatewayController::class, 'status']);
         $r->add('POST', '/api/gateway/restart', [GatewayController::class, 'restart']);
         $r->add('PUT', '/api/uploads', [FilesController::class, 'upload']);
@@ -113,8 +121,12 @@ final class App
 
     private static function manifest(): never
     {
-        $name = (string) Config::get('app_name', 'Hermes');
+        $brand = Branding::publicState();
+        $name = $brand['app_name'];
         $origin = rtrim((string) Config::get('base_url'), '/');
+        $icon192 = $origin . $brand['urls']['icon192'];
+        $icon512 = $origin . $brand['urls']['icon512'];
+        $bg = $brand['colors']['dark']['bg'] ?? '#212529';
         header('Content-Type: application/manifest+json; charset=utf-8');
         header('Cache-Control: no-store');
         echo json_encode([
@@ -124,12 +136,12 @@ final class App
             'start_url' => $origin . '/',
             'scope' => $origin . '/',
             'display' => 'standalone',
-            'background_color' => '#212529',
-            'theme_color' => '#212529',
+            'background_color' => $bg,
+            'theme_color' => $bg,
             'icons' => [
-                ['src' => $origin . '/icons/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
-                ['src' => $origin . '/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
-                ['src' => $origin . '/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => $icon192, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => $icon512, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => $icon512, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
             ],
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         exit;

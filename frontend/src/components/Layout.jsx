@@ -12,6 +12,8 @@ import { ToolsView } from './ToolsView.jsx';
 import { McpView } from './McpView.jsx';
 import { JobsView } from './JobsView.jsx';
 import { PersonaView } from './PersonaView.jsx';
+import { BrandingView } from './BrandingView.jsx';
+import { BrandMark, readBrand } from './BrandMark.jsx';
 import { WorkView } from './WorkView.jsx';
 import { disablePush, enablePush, pushPrefOn, pushSupported } from '../push.js';
 import { play, setSoundsEnabled, soundsEnabled } from '../sounds.js';
@@ -66,6 +68,7 @@ function viewFromHash() {
   if (location.hash === '#/mcp') return 'mcp';
   if (location.hash === '#/jobs') return 'jobs';
   if (location.hash === '#/persona') return 'persona';
+  if (location.hash === '#/branding') return 'branding';
   if (location.hash === '#/work') return 'work';
   return 'chat';
 }
@@ -94,7 +97,7 @@ export function Layout({ user, session = null, onLoggedOut }) {
   const [models, setModels] = useState(null);
   const [limits, setLimits] = useState(null);
   const [chatDraft, setChatDraft] = useState('');
-  const appName = document.documentElement.dataset.appName || 'Hermes';
+  const [brand, setBrand] = useState(readBrand);
   const rawVersion = document.documentElement.dataset.appVersion || '';
   const appVersion = /^\d+\.\d+\.\d+$/.test(rawVersion) ? rawVersion : '';
 
@@ -128,8 +131,13 @@ export function Layout({ user, session = null, onLoggedOut }) {
         return id;
       });
     };
+    const onBrand = () => setBrand(readBrand());
     addEventListener('hashchange', onHash);
-    return () => removeEventListener('hashchange', onHash);
+    addEventListener('kocoui:branding', onBrand);
+    return () => {
+      removeEventListener('hashchange', onHash);
+      removeEventListener('kocoui:branding', onBrand);
+    };
   }, []);
 
   function select(id) {
@@ -304,10 +312,11 @@ export function Layout({ user, session = null, onLoggedOut }) {
             icon="bi bi-list"
             onClick={() => setSidebarOpen((o) => !o)}
           />
-          <span class="navbar-brand mb-0 h1 text-truncate d-none d-lg-inline">
-            <i class="bi bi-robot me-2" aria-hidden="true"></i>
-            {appName}
-          </span>
+          <BrandMark
+            class="navbar-brand mb-0 h1 text-truncate d-none d-lg-inline"
+            name={brand.name}
+            logo={brand.logo}
+          />
           {appVersion && (
             <span class="app-version d-none d-lg-inline" aria-label={t('nav.version', { version: appVersion })}>
               {appVersion}
@@ -394,6 +403,20 @@ export function Layout({ user, session = null, onLoggedOut }) {
                 >
                   <i class="bi bi-palette me-2" aria-hidden="true"></i>
                   {t('nav.theme.customize')}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  class="dropdown-item"
+                  role="menuitem"
+                  onClick={() => {
+                    setSettingsOpen(false);
+                    show('branding');
+                  }}
+                >
+                  <i class="bi bi-award me-2" aria-hidden="true"></i>
+                  {t('nav.branding')}
                 </button>
               </li>
               {pushSupported() && (
@@ -489,6 +512,7 @@ export function Layout({ user, session = null, onLoggedOut }) {
           {view === 'mcp' && <McpView />}
           {view === 'jobs' && (features.jobs_admin ? <JobsView /> : <div class="p-4 text-body-secondary">{t('jobs.disabled')}</div>)}
           {view === 'persona' && <PersonaView />}
+          {view === 'branding' && <BrandingView />}
           {view === 'work' && <WorkView onAskAgent={askWork} />}
         </main>
       </div>

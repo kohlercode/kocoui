@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace KocoUI\Push;
 
+use KocoUI\Branding;
 use KocoUI\Config;
 use KocoUI\Db;
 
@@ -44,12 +45,14 @@ final class Notifier
         if (!self::enabled()) {
             return;
         }
-        $app = (string) Config::get('app_name', 'Hermes');
+        $brand = Branding::publicState();
+        $app = $brand['app_name'];
         $payload = json_encode([
             'title' => $message['title'] !== '' ? $message['title'] : $app,
             'body' => $message['body'] ?? '',
             'url' => $message['url'] ?? ((string) Config::get('base_url') . '/'),
             'tag' => $message['tag'] ?? null,
+            'icon' => $brand['urls']['icon192'],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
         $urgency = $message['urgency'] ?? 'normal';
         $ttl = $urgency === 'high' ? 300 : 86400;

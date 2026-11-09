@@ -50,6 +50,7 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 - Uploads (button, drag and drop, paste) and files the agent sends back, with an album and a lightbox
 - Read-only Work view of one directory the agent writes, off until that directory is configured
 - Persona page that edits Hermes `SOUL.md` in place
+- Branding page (Settings) for app name, PWA/navbar icons, and default light/dark color schemes
 - Light and dark themes, English, German, and Spanish
 - Optional Web Push when a reply or an approval is waiting, and a minimal installable PWA
 - Slash commands in the composer: `/help`, `/new`, `/status`, `/stop`, `/restart`, `/reload-mcp`

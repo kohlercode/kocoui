@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import { useI18n } from '../i18n/index.js';
-import { applyScheme, DEFAULTS, loadColors, sameScheme, saveColors } from '../theme.js';
+import { applyScheme, loadColors, sameScheme, saveColors, SITE_DEFAULTS } from '../theme.js';
 
 const GROUPS = [
   ['canvas', ['bg', 'surface', 'text']],
@@ -34,7 +34,7 @@ export function ThemePanel({ open, mode, onMode, onClose }) {
   }
 
   function reset() {
-    setDraft((d) => ({ ...d, [mode]: { ...DEFAULTS[mode] } }));
+    setDraft((d) => ({ ...d, [mode]: { ...SITE_DEFAULTS[mode] } }));
   }
 
   function save() {
@@ -90,7 +90,7 @@ export function ThemePanel({ open, mode, onMode, onClose }) {
           ))}
 
           <div class="d-flex flex-wrap gap-2 mt-auto pt-2 border-top">
-            <button type="button" class="btn btn-sm btn-outline-secondary" onClick={reset} disabled={sameScheme(scheme, DEFAULTS[mode])}>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onClick={reset} disabled={sameScheme(scheme, SITE_DEFAULTS[mode])}>
               {t('theme.reset')}
             </button>
             <div class="flex-grow-1"></div>

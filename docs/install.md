@@ -103,6 +103,10 @@ su - hermes -c 'hermes config set auxiliary.vision.provider <provider> && hermes
 systemctl restart hermes-gateway
 ```
 
+## Optional: branding
+
+After you sign in, open Settings → Branding to set the app name, upload navbar and PWA icons, and choose the default light and dark color schemes for the install. Files are stored under `app/var/branding/` so a release deploy does not wipe them. Theme panel Reset and new browsers use those site defaults; a saved personal palette in the browser still overrides them until reset.
+
 ## Optional: phone notifications
 
 Web Push is configured on the first deploy. In the UI, open Settings and enable notifications. To rotate the keys:

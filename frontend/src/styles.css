@@ -46,6 +46,26 @@ body,
   flex-shrink: 0;
 }
 
+.brand-logo {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+  vertical-align: -0.25rem;
+}
+
+.branding-icon-preview {
+  width: 3.5rem;
+  height: 3.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.branding-icon-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 /* sidebar */
 .sidebar {
   position: relative;

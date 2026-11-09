@@ -68,6 +68,7 @@ check "CSP manifest-src self" "$(echo "$H" | grep -i 'content-security-policy:' 
 check "service worker reachable" "$("${AUTHWEB[@]}" -o /dev/null -w '%{http_code}' "https://$DOMAIN/sw.js")" "200"
 check "web manifest reachable" "$("${AUTHWEB[@]}" -o /dev/null -w '%{http_code}' "https://$DOMAIN/manifest.webmanifest")" "200"
 check "PWA icon 192 reachable" "$("${AUTHWEB[@]}" -o /dev/null -w '%{http_code}' "https://$DOMAIN/icons/icon-192.png")" "200"
+check "branding icon route reachable" "$("${AUTHWEB[@]}" -o /dev/null -w '%{http_code}' "https://$DOMAIN/branding/icon-192.png")" "200"
 check "X-Frame-Options DENY" "$(has 'x-frame-options: DENY')" "yes"
 check "nosniff" "$(has 'x-content-type-options: nosniff')" "yes"
 check "Referrer-Policy no-referrer" "$(has 'referrer-policy: no-referrer')" "yes"
@@ -98,6 +99,7 @@ check "PHP-FPM pool runs as $APP_USER" "$(awk -F' *= *' '$1 == "user" {print $2}
 check "Hermes .env is 600" "$(stat -c %a "$HERMES_HOME/.env")" "600"
 check "app config.php is 600 $APP_USER" "$(stat -c '%a %U' "$APP_ROOT/config/config.php")" "600 $APP_USER"
 check "app database is 600" "$(stat -c %a "$APP_ROOT/var/data/app.sqlite")" "600"
+check "branding dir is 700 $APP_USER" "$(stat -c '%a %U' "$APP_ROOT/var/branding" 2>/dev/null)" "700 $APP_USER"
 check "no leftover .env backups" "$(find "$HERMES_HOME" -maxdepth 1 -name '.env.bak*' | wc -l)" "0"
 MODE=$(awk '/^approvals:/ {a=1; next} a && /^[^ ]/ {a=0} a && $1 == "mode:" {gsub(/["'\'']/, "", $2); print $2}' "$HERMES_HOME/config.yaml")
 check "approvals.mode is not off" "$([ -n "$MODE" ] && [ "$MODE" != off ] && echo yes || echo "no ($MODE)")" "yes"

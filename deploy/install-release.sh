@@ -115,6 +115,7 @@ else
 fi
 
 echo "== permissions"
+install -d -o "$APP_USER" -g "$APP_USER" -m 700 "$APP_ROOT/var/branding" "$APP_ROOT/var/branding/icons"
 chown -R "$APP_USER:$APP_USER" "$APP_ROOT"
 # code: app user only; public/: readable by nginx (www-data is in the app user's group)
 find "$APP_ROOT/bin" "$APP_ROOT/src" -type d -exec chmod 700 {} +
@@ -124,6 +125,7 @@ find "$APP_ROOT/public" -type f -exec chmod 640 {} +
 chmod 700 "$APP_ROOT/config" "$APP_ROOT/var"
 chmod 600 "$APP_ROOT/config/"*.php
 find "$APP_ROOT/var/data" -type f -exec chmod 600 {} +
+chmod 700 "$APP_ROOT/var/branding" "$APP_ROOT/var/branding/icons"
 
 echo "== check"
 PHPV="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"

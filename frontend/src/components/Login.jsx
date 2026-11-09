@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import { api, setCsrf } from '../api.js';
 import { useI18n } from '../i18n/index.js';
 import { LanguageSelect } from './LanguageSelect.jsx';
+import { BrandMark, readBrand } from './BrandMark.jsx';
 
 export function Login({ onSuccess }) {
   const { t } = useI18n();
@@ -10,7 +11,7 @@ export function Login({ onSuccess }) {
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const appName = document.documentElement.dataset.appName || 'Hermes';
+  const brand = readBrand();
 
   async function submit(e) {
     e.preventDefault();
@@ -40,8 +41,7 @@ export function Login({ onSuccess }) {
         <div class="card-body p-4">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h4 mb-0">
-              <i class="bi bi-robot me-2" aria-hidden="true"></i>
-              {appName}
+              <BrandMark name={brand.name} logo={brand.logo} />
             </h1>
             <LanguageSelect />
           </div>

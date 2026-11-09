@@ -15,10 +15,11 @@ self.addEventListener('push', (event) => {
     data = { body: event.data ? event.data.text() : '' };
   }
   const title = typeof data.title === 'string' && data.title ? data.title : 'Hermes';
+  const icon = typeof data.icon === 'string' && data.icon ? data.icon : '/icons/icon-192.png';
   const options = {
     body: typeof data.body === 'string' ? data.body : '',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
+    icon,
+    badge: icon,
     data: { url: typeof data.url === 'string' && data.url ? data.url : '/' },
     tag: typeof data.tag === 'string' ? data.tag : undefined,
     renotify: !!data.tag,

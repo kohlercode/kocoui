@@ -49,6 +49,13 @@ export function errorText(t, e) {
     restart_pending: 'cmd.restart.pending',
     restart_cooldown: 'cmd.restart.cooldown',
     mcp_reload_unavailable: 'cmd.reloadMcp.unavailable',
+    branding_invalid: 'branding.error.invalid',
+    branding_name_too_long: 'branding.error.nameTooLong',
+    branding_icon_type: 'branding.error.iconType',
+    branding_icon_invalid: 'branding.error.iconInvalid',
+    branding_icon_not_square: 'branding.error.notSquare',
+    branding_icon_size: 'branding.error.iconSize',
+    branding_unavailable: 'branding.error.unavailable',
     push_disabled: 'nav.push.disabled',
     demo_readonly: 'demo.note.short',
   };

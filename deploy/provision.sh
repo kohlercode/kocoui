@@ -84,7 +84,7 @@ id "$APP_USER" >/dev/null 2>&1 || adduser --disabled-password --gecos "" "$APP_U
 install -d -o "$APP_USER" -g "$APP_USER" -m 750 "$APP_ROOT" "$APP_ROOT/public"
 install -d -o "$APP_USER" -g "$APP_USER" -m 700 "$APP_ROOT/config" "$APP_ROOT/var" \
   "$APP_ROOT/var/sessions" "$APP_ROOT/var/tmp" "$APP_ROOT/var/log" "$APP_ROOT/var/data" "$APP_ROOT/var/cache" \
-  "$APP_ROOT/var/run"
+  "$APP_ROOT/var/run" "$APP_ROOT/var/branding" "$APP_ROOT/var/branding/icons"
 chmod 750 "/home/$APP_USER"
 # nginx serves static files from public/ and needs to traverse the home dir; config/ and var/ stay 700
 usermod -aG "$APP_USER" www-data

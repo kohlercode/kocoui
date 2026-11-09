@@ -8,6 +8,7 @@ const INFO_BLEND = '#6d9399';
 const INFO_WEIGHT = 0.55;
 const HEX = /^#[0-9a-f]{6}$/i;
 
+/** Built-in palette when the install has no branding defaults. */
 export const DEFAULTS = {
   light: {
     bg: '#f3f4f6',
@@ -28,6 +29,32 @@ export const DEFAULTS = {
     warning: '#c4ae78',
   },
 };
+
+/** Install-wide defaults from Shell data-default-colors; falls back to DEFAULTS. */
+export const SITE_DEFAULTS = readSiteDefaults();
+
+function readSiteDefaults() {
+  try {
+    const raw = document.documentElement.dataset.defaultColors || '';
+    if (!raw) return { light: { ...DEFAULTS.light }, dark: { ...DEFAULTS.dark } };
+    const parsed = JSON.parse(raw);
+    return {
+      light: sanitize(parsed.light, DEFAULTS.light),
+      dark: sanitize(parsed.dark, DEFAULTS.dark),
+    };
+  } catch {
+    return { light: { ...DEFAULTS.light }, dark: { ...DEFAULTS.dark } };
+  }
+}
+
+/** After branding save, refresh site defaults and clear CSS vars when at site default. */
+export function setSiteDefaults(colors) {
+  SITE_DEFAULTS.light = sanitize(colors?.light, DEFAULTS.light);
+  SITE_DEFAULTS.dark = sanitize(colors?.dark, DEFAULTS.dark);
+  document.documentElement.dataset.defaultColors = JSON.stringify(SITE_DEFAULTS);
+  const mode = getTheme();
+  applyScheme(mode, loadColors()[mode]);
+}
 
 export function getTheme() {
   const stored = localStorage.getItem(MODE_KEY);
@@ -56,14 +83,17 @@ export function loadColors() {
     stored = {};
   }
   return {
-    light: sanitize(stored.light, DEFAULTS.light),
-    dark: sanitize(stored.dark, DEFAULTS.dark),
+    light: sanitize(stored.light, SITE_DEFAULTS.light),
+    dark: sanitize(stored.dark, SITE_DEFAULTS.dark),
   };
 }
 
 export function saveColors(colors) {
-  const next = { light: sanitize(colors.light, DEFAULTS.light), dark: sanitize(colors.dark, DEFAULTS.dark) };
-  if (sameScheme(next.light, DEFAULTS.light) && sameScheme(next.dark, DEFAULTS.dark)) {
+  const next = {
+    light: sanitize(colors.light, SITE_DEFAULTS.light),
+    dark: sanitize(colors.dark, SITE_DEFAULTS.dark),
+  };
+  if (sameScheme(next.light, SITE_DEFAULTS.light) && sameScheme(next.dark, SITE_DEFAULTS.dark)) {
     localStorage.removeItem(COLORS_KEY);
   } else {
     localStorage.setItem(COLORS_KEY, JSON.stringify(next));
@@ -71,10 +101,11 @@ export function saveColors(colors) {
   return next;
 }
 
-/** Writes one scheme onto the document as CSS variables. Defaults stay in the stylesheet. */
+/** Writes one scheme onto the document as CSS variables. Site defaults stay in the stylesheet when they match builtin. */
 export function applyScheme(mode, colors) {
   const root = document.documentElement.style;
-  const scheme = sanitize(colors, DEFAULTS[mode] || DEFAULTS.light);
+  const scheme = sanitize(colors, SITE_DEFAULTS[mode] || SITE_DEFAULTS.light);
+  // Clear custom vars when equal to the built-in CSS defaults so theme.css wins.
   if (sameScheme(scheme, DEFAULTS[mode])) {
     for (const name of variableNames()) root.removeProperty(name);
     return scheme;

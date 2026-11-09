@@ -4,6 +4,9 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-09
+
+- Settings → Branding: set the app name, upload navbar/PWA/favicon icons, and define install-wide default light and dark color schemes. Theme panel Reset and first visits use those defaults; personal browser colors still override until reset. Assets live under `var/branding/` so they survive releases.
 - Slash command `/reload-mcp` (alias `/reload_mcp`) calls Hermes `POST /v1/mcp/reload` when that API exists. On Hermes 0.22.x it usually is missing; the UI says so and points you to `/restart` instead of sending useless chat text.
 
 ## [1.2.0] - 2026-11-06
