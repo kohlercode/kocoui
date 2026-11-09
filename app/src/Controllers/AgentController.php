@@ -100,6 +100,31 @@ final class AgentController
         Response::json(['data' => McpServers::fromToolsets($client->toolsets()), 'source' => 'toolsets']);
     }
 
+    /** POST /v1/mcp/reload when Hermes exposes it; no config or secrets in the body. */
+    public static function mcpReload(Request $req): never
+    {
+        $client = new HermesClient();
+        try {
+            $res = $client->mcpReload();
+        } catch (HttpError $e) {
+            if ($e->status === 404 || str_starts_with($e->errorCode, 'hermes_404')) {
+                throw new HttpError(
+                    501,
+                    'mcp_reload_unavailable',
+                    'This Hermes build has no MCP reload API',
+                );
+            }
+            throw $e;
+        }
+        $servers = (int) ($res['server_count'] ?? $res['servers'] ?? 0);
+        $tools = (int) ($res['tool_count'] ?? $res['tools'] ?? 0);
+        Response::json([
+            'ok' => true,
+            'servers' => max(0, $servers),
+            'tools' => max(0, $tools),
+        ]);
+    }
+
     public static function jobs(Request $req): never
     {
         $client = new HermesClient();

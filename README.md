@@ -52,7 +52,7 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 - Persona page that edits Hermes `SOUL.md` in place
 - Light and dark themes, English, German, and Spanish
 - Optional Web Push when a reply or an approval is waiting, and a minimal installable PWA
-- Slash commands in the composer: `/help`, `/new`, `/status`, `/stop`, `/restart`
+- Slash commands in the composer: `/help`, `/new`, `/status`, `/stop`, `/restart`, `/reload-mcp`
 
 <table>
   <tr>

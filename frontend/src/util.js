@@ -48,6 +48,7 @@ export function errorText(t, e) {
     restart_unavailable: 'cmd.restart.unavailable',
     restart_pending: 'cmd.restart.pending',
     restart_cooldown: 'cmd.restart.cooldown',
+    mcp_reload_unavailable: 'cmd.reloadMcp.unavailable',
     push_disabled: 'nav.push.disabled',
     demo_readonly: 'demo.note.short',
   };

@@ -1,4 +1,4 @@
-/** Slash commands handled by the web UI, not by Hermes /v1/runs. */
+/** Slash commands shown in the composer menu. Handled by the web UI (not Hermes chat text). */
 
 export const COMMANDS = [
   { name: 'help', aliases: [], descKey: 'cmd.help.desc' },
@@ -6,6 +6,7 @@ export const COMMANDS = [
   { name: 'status', aliases: [], descKey: 'cmd.status.desc' },
   { name: 'stop', aliases: [], descKey: 'cmd.stop.desc' },
   { name: 'restart', aliases: [], descKey: 'cmd.restart.desc' },
+  { name: 'reload-mcp', aliases: ['reload_mcp'], descKey: 'cmd.reloadMcp.desc' },
 ];
 
 export function parseSlash(text) {

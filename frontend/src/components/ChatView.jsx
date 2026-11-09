@@ -187,8 +187,8 @@ export function ChatView({
     setNotice(null);
     try {
       const res = await api('POST', '/api/runs', { input: text, session_id: sessionId || '', model: effectiveModel, attachments: ids }, {
-        'Idempotency-Key': pendingSubmit.current.key,
-      });
+      'Idempotency-Key': pendingSubmit.current.key,
+    });
       pendingSubmit.current = null;
       const sid = res.session_id;
       if (!sessionId) {
@@ -316,6 +316,27 @@ export function ChatView({
         update(t('cmd.restart.waiting'));
         const ready = await waitForGateway();
         update(ready ? t('cmd.restart.ready') : t('cmd.restart.timeout'));
+        return;
+      }
+      case 'reload-mcp': {
+        if (running) {
+          noteSystem(t('cmd.reloadMcp.busy'));
+          return;
+        }
+        noteSystem(t('cmd.reloadMcp.working'));
+        try {
+          const res = await api('POST', '/api/mcp/reload');
+          noteSystem(t('cmd.reloadMcp.done', {
+            servers: res.servers ?? 0,
+            tools: res.tools ?? 0,
+          }));
+        } catch (e) {
+          if (e?.code === 'mcp_reload_unavailable') {
+            noteSystem(t('cmd.reloadMcp.unavailable'));
+            return;
+          }
+          throw e;
+        }
         return;
       }
       default:

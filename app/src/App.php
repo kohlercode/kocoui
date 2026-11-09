@@ -78,6 +78,7 @@ final class App
         $r->add('GET', '/api/toolsets', [AgentController::class, 'toolsets']);
         $r->add('GET', '/api/skills', [AgentController::class, 'skills']);
         $r->add('GET', '/api/mcp/servers', [AgentController::class, 'mcpServers']);
+        $r->add('POST', '/api/mcp/reload', [AgentController::class, 'mcpReload']);
         $r->add('GET', '/api/jobs', [AgentController::class, 'jobs']);
         $r->add('GET', '/api/persona', [PersonaController::class, 'show']);
         $r->add('PUT', '/api/persona', [PersonaController::class, 'save']);

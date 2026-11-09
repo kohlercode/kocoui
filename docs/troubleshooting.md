@@ -18,7 +18,7 @@ Kocoui remembers deleted session ids and hides them, then deletes again. Tombsto
 
 KocoUI does not read Hermes `config.yaml`. It asks the API for `GET /v1/mcp/servers`. The installed Hermes API often answers 404 for that path. Then the page lists `mcp-*` toolsets instead. A server that is in the config but failed to connect will not appear.
 
-Add or repair servers with `hermes mcp` as the agent user, then restart `hermes-gateway` or use `/reload-mcp` in a Hermes session.
+Add or repair servers with `hermes mcp` as the agent user, then restart `hermes-gateway` (`/restart` in KocoUI). Hermes 0.22.x usually has no `POST /v1/mcp/reload` on the API server, so the chat slash `/reload-mcp` in a CLI/TUI session is not the same as sending that text through KocoUI. When Hermes adds the reload API, KocoUI's `/reload-mcp` will call it.
 
 ## The skills page says unavailable
 

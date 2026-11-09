@@ -4,6 +4,8 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+- Slash command `/reload-mcp` (alias `/reload_mcp`) calls Hermes `POST /v1/mcp/reload` when that API exists. On Hermes 0.22.x it usually is missing; the UI says so and points you to `/restart` instead of sending useless chat text.
+
 ## [1.2.0] - 2026-11-06
 
 - Work view previews: SVG as images, padded media, syntax-highlighted source, HTML in a sandboxed modal, and a clear download panel for types that cannot be previewed (for example spreadsheets).

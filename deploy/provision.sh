@@ -195,7 +195,7 @@ fi
 render "$T/nginx-http-context.conf" /etc/nginx/conf.d/hermesweb.conf
 render "$T/nginx-headers-base.conf" /etc/nginx/snippets/hermesweb-headers-base.conf
 render "$T/nginx-headers.conf" /etc/nginx/snippets/hermesweb-headers.conf
-render "$T/nginx-php.conf" /etc/nginx/snippets/hermesweb-php.conf
+render "$T/nginx-php.conf" "/etc/nginx/snippets/hermesweb-php-$APP_USER.conf"
 if [ -n "$WORK_ROOT" ]; then
   render "$T/nginx-work.conf" /etc/nginx/snippets/hermesweb-work.conf
 else
