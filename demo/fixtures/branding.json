@@ -1,0 +1,35 @@
+{
+  "app_name": "KocoUI",
+  "colors": {
+    "light": {
+      "bg": "#f3f4f6",
+      "surface": "#ffffff",
+      "text": "#2c3136",
+      "primary": "#3f6f9f",
+      "danger": "#b55252",
+      "success": "#3d7a5a",
+      "warning": "#8f7034"
+    },
+    "dark": {
+      "bg": "#1a1d21",
+      "surface": "#262a2e",
+      "text": "#cfd3d7",
+      "primary": "#7f9dba",
+      "danger": "#c48b90",
+      "success": "#7eaa96",
+      "warning": "#c4ae78"
+    }
+  },
+  "icons": {
+    "logo": null,
+    "favicon": false,
+    "icon192": false,
+    "icon512": false
+  },
+  "urls": {
+    "logo": "",
+    "favicon": "/icons/icon-192.png",
+    "icon192": "/icons/icon-192.png",
+    "icon512": "/icons/icon-512.png"
+  }
+}

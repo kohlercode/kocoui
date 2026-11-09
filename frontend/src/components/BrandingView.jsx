@@ -273,7 +273,7 @@ function ColorRow({ name, color, label, onPick }) {
 
 function putIcon(slot, file) {
   if (import.meta.env.VITE_DEMO) {
-    return import('../../demo/note.js').then((m) => m.rejectDemo());
+    return import('../../../demo/note.js').then((m) => m.rejectDemo());
   }
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();

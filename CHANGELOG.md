@@ -4,6 +4,8 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+- Fix the public demo build: BrandingView imported `demo/note.js` from the wrong path, so GitHub Pages failed to publish after 1.3.0. Add a branding fixture for the demo Settings → Branding page.
+
 ## [1.3.1] - 2026-11-09
 
 - Fix push-watch: restore the missing `Config` import in `RunWatcher` so completion and approval notifications work again.

@@ -7,6 +7,7 @@ import skills from './fixtures/skills.json';
 import mcp from './fixtures/mcp.json';
 import jobs from './fixtures/jobs.json';
 import persona from './fixtures/persona.json';
+import branding from './fixtures/branding.json';
 import files from './fixtures/files.json';
 import work from './fixtures/work.json';
 import approval from './fixtures/approval.json';
@@ -160,6 +161,7 @@ function get(url, query = '') {
   if (url === '/api/mcp/servers') return mcp;
   if (url === '/api/jobs') return jobList();
   if (url === '/api/persona') return persona;
+  if (url === '/api/branding') return branding;
   if (url === '/api/gateway/status') return { ok: true, restart_pending: false };
   const runMatch = url.match(/^\/api\/runs\/([^/]+)$/);
   if (runMatch && decodeURIComponent(runMatch[1]) === 'run_approval') {
