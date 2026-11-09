@@ -5,6 +5,7 @@ namespace KocoUI\Push;
 
 use KocoUI\Approval;
 use KocoUI\Branding;
+use KocoUI\Config;
 use KocoUI\Hermes\HermesClient;
 use KocoUI\Http\HttpError;
 

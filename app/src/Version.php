@@ -6,5 +6,5 @@ namespace KocoUI;
 /** Keep this equal to the "version" field in package.json. */
 final class Version
 {
-    public const VERSION = '1.3.0';
+    public const VERSION = '1.3.1';
 }

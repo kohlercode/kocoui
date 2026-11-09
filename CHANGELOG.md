@@ -4,6 +4,10 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-09
+
+- Fix push-watch: restore the missing `Config` import in `RunWatcher` so completion and approval notifications work again.
+
 ## [1.3.0] - 2026-11-09
 
 - Settings → Branding: set the app name, upload navbar/PWA/favicon icons, and define install-wide default light and dark color schemes. Theme panel Reset and first visits use those defaults; personal browser colors still override until reset. Assets live under `var/branding/` so they survive releases.
