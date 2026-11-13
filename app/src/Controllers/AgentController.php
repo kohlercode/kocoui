@@ -127,10 +127,9 @@ final class AgentController
 
     public static function jobs(Request $req): never
     {
+        // Always try Hermes /api/jobs. Hermes may report features.jobs_admin false
+        // while the routes still work (cron created via the agent tools).
         $client = new HermesClient();
-        if (empty($client->capabilities()['features']['jobs_admin'])) {
-            throw new HttpError(404, 'feature_disabled', 'Scheduled jobs are not enabled on this agent');
-        }
         $out = [];
         foreach ($client->jobs()['jobs'] ?? [] as $j) {
             if (!is_array($j)) {

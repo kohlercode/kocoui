@@ -93,7 +93,6 @@ export function Layout({ user, session = null, onLoggedOut }) {
   const [pushBusy, setPushBusy] = useState(false);
   const [soundsOn, setSoundsOn] = useState(soundsEnabled);
   const settingsRef = useRef(null);
-  const [features, setFeatures] = useState({});
   const [models, setModels] = useState(null);
   const [limits, setLimits] = useState(null);
   const [chatDraft, setChatDraft] = useState('');
@@ -117,7 +116,6 @@ export function Layout({ user, session = null, onLoggedOut }) {
   useEffect(() => {
     loadSessions();
     api('GET', '/api/capabilities').then((r) => {
-      setFeatures(r.features || {});
       setLimits(r.files || null);
     }, () => {});
     api('GET', '/api/models').then(setModels, () => setModels({ current: {}, providers: [] }));
@@ -351,14 +349,12 @@ export function Layout({ user, session = null, onLoggedOut }) {
               icon="bi bi-plugin"
               onClick={() => show('mcp')}
             />
-            {features.jobs_admin && (
-              <IconBtn
-                class={`btn ${view === 'jobs' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-                label={t('nav.jobs')}
-                icon="bi bi-clock-history"
-                onClick={() => show('jobs')}
-              />
-            )}
+            <IconBtn
+              class={`btn ${view === 'jobs' ? 'btn-secondary' : 'btn-outline-secondary'}`}
+              label={t('nav.jobs')}
+              icon="bi bi-clock-history"
+              onClick={() => show('jobs')}
+            />
             <IconBtn
               class={`btn ${view === 'persona' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               label={t('nav.persona')}
@@ -510,7 +506,7 @@ export function Layout({ user, session = null, onLoggedOut }) {
           </div>
           {view === 'tools' && <ToolsView />}
           {view === 'mcp' && <McpView />}
-          {view === 'jobs' && (features.jobs_admin ? <JobsView /> : <div class="p-4 text-body-secondary">{t('jobs.disabled')}</div>)}
+          {view === 'jobs' && <JobsView />}
           {view === 'persona' && <PersonaView />}
           {view === 'branding' && <BrandingView />}
           {view === 'work' && <WorkView onAskAgent={askWork} />}
