@@ -107,6 +107,20 @@ systemctl restart hermes-gateway
 
 After you sign in, open Settings → Branding to set the app name, upload navbar and PWA icons, and choose the default light and dark color schemes for the install. Files are stored under `app/var/branding/` so a release deploy does not wipe them. Theme panel Reset and new browsers use those site defaults; a saved personal palette in the browser still overrides them until reset.
 
+## Optional: fonts
+
+The appearance panel (Settings) lets each browser pick a UI font. The shipped set is ten self-hosted Google Fonts plus the device system stack. Files live under `app/public/fonts/` and are served from `/fonts/` — do not load fonts from a CDN.
+
+`config.php` under `fonts` controls the install-wide catalog:
+
+- Omit `families` to offer the shipped ten, plus System.
+- Set `families` to replace that list (System stays available). Paths are `.woff2` files relative to `app/public/fonts/`.
+- `default` is the first-visit family (`system` unless you change it).
+
+To add a font, copy the `.woff2` file (and its license) into `app/public/fonts/<id>/`, copy the example `families` list from `config.example.php` into `config.php`, append the new entry, and reload PHP-FPM. A release deploy replaces `public/`, so extra fonts belong in the project tree.
+
+nginx gains a dedicated `/fonts/` location on the next `provision.sh`. Until then, the existing `try_files` still serves the files.
+
 ## Optional: phone notifications
 
 Web Push is configured on the first deploy. In the UI, open Settings and enable notifications. To rotate the keys:

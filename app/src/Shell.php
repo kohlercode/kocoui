@@ -29,6 +29,7 @@ final class Shell
         $name = $brand['app_name'];
         $lang = (string) Config::get('default_lang', 'en');
         $colorsJson = json_encode($brand['colors'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $fontsJson = json_encode(Fonts::catalog(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         $logoUrl = $brand['urls']['logo'];
         $icon192 = $brand['urls']['icon192'];
         $favicon = $brand['urls']['favicon'];
@@ -41,7 +42,7 @@ final class Shell
         if ($logoUrl !== '') {
             echo ' data-app-logo="' . $e($logoUrl) . '"';
         }
-        echo ' data-default-colors="' . $e($colorsJson) . '">';
+        echo ' data-default-colors="' . $e($colorsJson) . '" data-fonts="' . $e($fontsJson) . '">';
         echo '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">';
         echo '<meta name="robots" content="noindex, nofollow"><title>' . $e($name) . '</title>';
         echo '<meta name="theme-color" content="' . $e($themeColor) . '">';

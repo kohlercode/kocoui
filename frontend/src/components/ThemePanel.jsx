@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import { useI18n } from '../i18n/index.js';
 import { applyScheme, loadColors, sameScheme, saveColors, SITE_DEFAULTS } from '../theme.js';
+import { SYSTEM_ID, fontCatalog, getFont, prefetchFonts, setFont } from '../fonts.js';
 
 const GROUPS = [
   ['canvas', ['bg', 'surface', 'text']],
@@ -11,6 +12,8 @@ export function ThemePanel({ open, mode, onMode, onClose }) {
   const { t } = useI18n();
   const [baseline, setBaseline] = useState(loadColors);
   const [draft, setDraft] = useState(loadColors);
+  const [font, setFontId] = useState(getFont);
+  const families = fontCatalog().families;
 
   useLayoutEffect(() => {
     if (open) applyScheme(mode, draft[mode]);
@@ -22,6 +25,18 @@ export function ThemePanel({ open, mode, onMode, onClose }) {
     addEventListener('keydown', onKey);
     return () => removeEventListener('keydown', onKey);
   }, [open, mode, baseline]);
+
+  useEffect(() => {
+    if (!open) return;
+    prefetchFonts();
+    const select = document.getElementById('theme-font');
+    if (!select) return;
+    const list = fontCatalog().families;
+    for (const opt of select.options) {
+      const fam = list.find((item) => item.id === opt.value);
+      if (fam && fam.id !== SYSTEM_ID) opt.style.fontFamily = `"${fam.family.replace(/["\\]/g, '')}", sans-serif`;
+    }
+  }, [open]);
 
   function close() {
     applyScheme(mode, baseline[mode]);
@@ -69,6 +84,23 @@ export function ThemePanel({ open, mode, onMode, onClose }) {
               {t('theme.dark')}
             </button>
           </div>
+          <div>
+            <label class="form-label" for="theme-font">{t('theme.font')}</label>
+            <select
+              id="theme-font"
+              class="form-select"
+              value={font}
+              onChange={(e) => setFontId(setFont(e.currentTarget.value))}
+            >
+              {families.map((fam) => (
+                <option key={fam.id} value={fam.id}>
+                  {fam.id === SYSTEM_ID ? t('theme.font.system') : fam.family}
+                </option>
+              ))}
+            </select>
+            <p class="small text-body-secondary mb-0 mt-1">{t('theme.font.help')}</p>
+          </div>
+
           <p class="small text-body-secondary mb-0">{t('theme.hint')}</p>
 
           <div class="theme-preview border rounded p-3 d-flex flex-wrap gap-2" aria-hidden="true">

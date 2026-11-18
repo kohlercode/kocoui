@@ -5,6 +5,8 @@ import './styles.css';
 import { render } from 'preact';
 import { App } from './App.jsx';
 import { initTheme } from './theme.js';
+import { initFont } from './fonts.js';
 
 initTheme();
+initFont();
 render(<App />, document.getElementById('app'));

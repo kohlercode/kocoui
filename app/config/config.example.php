@@ -8,6 +8,29 @@ return [
     // Fallback UI language when the browser asks for none we have: 'en' or 'de'.
     'default_lang' => 'en',
 
+    // UI fonts. Files live under app/public/fonts/ and are served from /fonts/.
+    // Omit families to offer the shipped 10 Google Fonts plus System. If you set
+    // families, that list replaces the shipped set (System stays available).
+    // Paths are relative to app/public/fonts/ and must be .woff2.
+    'fonts' => [
+        'default' => 'system',
+        // 'families' => [
+        //     'inter' => [
+        //         'family' => 'Inter',
+        //         'weight' => '100 900',
+        //         'file' => [
+        //             'inter/inter-latin-wght-normal.woff2',
+        //             'inter/inter-latin-ext-wght-normal.woff2',
+        //         ],
+        //     ],
+        //     'comic-neue' => [
+        //         'family' => 'Comic Neue',
+        //         'file' => 'comic-neue/comic-neue-latin-400-normal.woff2',
+        //         'weight' => '400',
+        //     ],
+        // ],
+    ],
+
     'hermes' => [
         'base_url' => 'http://127.0.0.1:8642',
         // API_SERVER_KEY from the Hermes .env. Never put this anywhere the browser can see.

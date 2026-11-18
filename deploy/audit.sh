@@ -49,6 +49,8 @@ check "key prefix not in public files" "$(grep -rlF "${KEY:0:12}" "$APP_ROOT/pub
 check "no Hermes port or key name in public files" "$(grep -rlE "API_SERVER_KEY|:$PORT" "$APP_ROOT/public" | wc -l)" "0"
 EXT=$(grep -ohE "(fetch|EventSource|XMLHttpRequest)\([^)]{0,80}https?://" "$APP_ROOT"/public/assets/*.js | wc -l)
 check "bundle makes no requests to absolute URLs" "$EXT" "0"
+GOOGLE=$(grep -rlE "fonts\.(googleapis|gstatic)\.com" "$APP_ROOT/public" 2>/dev/null | wc -l)
+check "no Google Fonts CDN in public files" "$GOOGLE" "0"
 
 echo "== listening sockets"
 PUBLIC=$(ss -Htln | awk '{print $4}' | grep -vE '^(127\.[0-9.]+(%lo)?|\[::1\]|\[::ffff:127\.[0-9.]+\]):' | grep -oE '[0-9]+$' | sort -un | tr '\n' ' ' | sed 's/ $//')

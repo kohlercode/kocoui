@@ -4,6 +4,9 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-18
+
+- Settings → Appearance lets each browser pick a UI font from ten self-hosted Google Fonts, or the device system stack. Files live under `public/fonts`; `config.php` `fonts.families` replaces the shipped list so extra fonts can be added without a frontend rebuild. No CDN.
 - Fix the public demo build: BrandingView imported `demo/note.js` from the wrong path, so GitHub Pages failed to publish after 1.3.0. Add a branding fixture for the demo Settings → Branding page.
 
 ## [1.3.1] - 2026-11-09

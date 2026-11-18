@@ -51,7 +51,8 @@ PHP is a deliberate choice. It is what most web servers already run, and the bac
 - Read-only Work view of one directory the agent writes, off until that directory is configured
 - Persona page that edits Hermes `SOUL.md` in place
 - Branding page (Settings) for app name, PWA/navbar icons, and default light/dark color schemes
-- Light and dark themes, English, German, and Spanish
+- Appearance panel: light/dark colors and a self-hosted font picker (ten Google Fonts plus System; more via `config.php`)
+- English, German, and Spanish
 - Optional Web Push when a reply or an approval is waiting, and a minimal installable PWA
 - Slash commands in the composer: `/help`, `/new`, `/status`, `/stop`, `/restart`, `/reload-mcp`
 

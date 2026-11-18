@@ -6,6 +6,7 @@ import { useMemo, useState } from 'preact/hooks';
 import { render } from 'preact';
 import { I18n, initialLang, storeLang, translate } from '../frontend/src/i18n/index.js';
 import { initTheme } from '../frontend/src/theme.js';
+import { initFont } from '../frontend/src/fonts.js';
 import { Layout } from '../frontend/src/components/Layout.jsx';
 import { Login } from '../frontend/src/components/Login.jsx';
 import { Banner } from './Banner.jsx';
@@ -54,5 +55,6 @@ function DemoApp() {
 }
 
 initTheme();
+initFont();
 document.documentElement.lang = initialLang();
 render(<DemoApp />, document.getElementById('app'));
