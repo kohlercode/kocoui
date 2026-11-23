@@ -9,7 +9,6 @@ import { LanguageSelect } from './LanguageSelect.jsx';
 import { SessionList } from './SessionList.jsx';
 import { ChatView } from './ChatView.jsx';
 import { ToolsView } from './ToolsView.jsx';
-import { McpView } from './McpView.jsx';
 import { JobsView } from './JobsView.jsx';
 import { PersonaView } from './PersonaView.jsx';
 import { BrandingView } from './BrandingView.jsx';
@@ -65,7 +64,6 @@ function sessionFromHash() {
 
 function viewFromHash() {
   if (location.hash === '#/tools') return 'tools';
-  if (location.hash === '#/mcp') return 'mcp';
   if (location.hash === '#/jobs') return 'jobs';
   if (location.hash === '#/persona') return 'persona';
   if (location.hash === '#/branding') return 'branding';
@@ -344,12 +342,6 @@ export function Layout({ user, session = null, onLoggedOut }) {
               onClick={() => show('tools')}
             />
             <IconBtn
-              class={`btn ${view === 'mcp' ? 'btn-secondary' : 'btn-outline-secondary'}`}
-              label={t('nav.mcp')}
-              icon="bi bi-plugin"
-              onClick={() => show('mcp')}
-            />
-            <IconBtn
               class={`btn ${view === 'jobs' ? 'btn-secondary' : 'btn-outline-secondary'}`}
               label={t('nav.jobs')}
               icon="bi bi-clock-history"
@@ -505,7 +497,6 @@ export function Layout({ user, session = null, onLoggedOut }) {
             />
           </div>
           {view === 'tools' && <ToolsView />}
-          {view === 'mcp' && <McpView />}
           {view === 'jobs' && <JobsView />}
           {view === 'persona' && <PersonaView />}
           {view === 'branding' && <BrandingView />}

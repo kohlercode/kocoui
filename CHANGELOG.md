@@ -4,6 +4,10 @@ Keep `Version::VERSION` in `app/src/Version.php` equal to `version` in `package.
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-23
+
+- Remove the MCP servers page. Hermes often has no `GET /v1/mcp/servers`, so the list was empty or incomplete. Manage servers with `hermes mcp` and reconnect with `/restart` or `/reload-mcp`.
+
 ## [1.4.0] - 2026-11-18
 
 - Settings → Appearance lets each browser pick a UI font from ten self-hosted Google Fonts, or the device system stack. Files live under `public/fonts`; `config.php` `fonts.families` replaces the shipped list so extra fonts can be added without a frontend rebuild. No CDN.

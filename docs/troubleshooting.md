@@ -14,11 +14,9 @@ Hermes writes the auto-generated title a few seconds after a turn ends. A delete
 
 Kocoui remembers deleted session ids and hides them, then deletes again. Tombstones are kept for a few days so the daily file prune can still find them.
 
-## The MCP page is empty
+## MCP servers
 
-KocoUI does not read Hermes `config.yaml`. It asks the API for `GET /v1/mcp/servers`. The installed Hermes API often answers 404 for that path. Then the page lists `mcp-*` toolsets instead. A server that is in the config but failed to connect will not appear.
-
-Add or repair servers with `hermes mcp` as the agent user, then restart `hermes-gateway` (`/restart` in KocoUI). Hermes 0.22.x usually has no `POST /v1/mcp/reload` on the API server, so the chat slash `/reload-mcp` in a CLI/TUI session is not the same as sending that text through KocoUI. When Hermes adds the reload API, KocoUI's `/reload-mcp` will call it.
+KocoUI does not list or edit MCP servers, and it does not read Hermes `config.yaml`. Add or repair servers with `hermes mcp` as the agent user, then restart `hermes-gateway` (`/restart` in KocoUI). Hermes 0.22.x usually has no `POST /v1/mcp/reload` on the API server, so the chat slash `/reload-mcp` in a CLI/TUI session is not the same as sending that text through KocoUI. When Hermes adds the reload API, KocoUI's `/reload-mcp` will call it.
 
 ## The skills page says unavailable
 

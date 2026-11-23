@@ -102,11 +102,6 @@ final class HermesClient
         return $this->request('GET', '/v1/toolsets');
     }
 
-    public function mcpServers(): array
-    {
-        return $this->request('GET', '/v1/mcp/servers');
-    }
-
     /** Reload MCP from Hermes config. Empty body — no URLs or credentials. Hermes 0.22.5 often 404s. */
     public function mcpReload(): array
     {

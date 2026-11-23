@@ -17,7 +17,7 @@ A self-hosted PHP web interface for an existing Hermes Agent on the same machine
 - Persona edits `SOUL.md` only, in place, with one previous copy under `app/var/soul`.
 - Branding (app name, icons, default color schemes) lives under `app/var/branding/`. Do not write branding into `public/` (releases replace it). Do not rewrite `config.php` from the UI.
 - UI fonts are files under `app/public/fonts/`, listed by `config.php` `fonts`. Do not load fonts from a CDN.
-- MCP is a read-only list from the Hermes API (`/v1/mcp/servers`, or `mcp-*` toolsets). Do not read `~/.hermes/config.yaml`. Do not add an MCP editor.
+- There is no MCP servers page or editor. `/reload-mcp` calls Hermes `POST /v1/mcp/reload` when that exists. Do not read `~/.hermes/config.yaml`.
 - Web Push payloads are status lines and links, not prompts or commands.
 - User-facing strings belong in `frontend/src/i18n/en.json`, `de.json`, and `es.json`. German uses "du". Spanish uses "tú".
 
